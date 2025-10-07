@@ -10,20 +10,25 @@ import Guardians from "./pages/admin/Guardians.jsx";
 import Drivers from "./pages/admin/Drivers.jsx";
 import School from "./pages/admin/School.jsx";
 import Buses from "./pages/admin/Buses.jsx";
-
+import User from "./pages/user/Home.jsx";
+import SidebarUser from "./components/sidebar/SideBarUser.jsx";
 function App() {
   return (
     <Router>
       <div className="flex">
-        <Sidebar />
+        {/* <Sidebar /> */}
+        <SidebarUser/>
         <div className="flex-1 p-4">
           <Routes>
-            <Route path="/dashboard" element={<Dashboard />} />
+            {/* Admin */}
+            {/* <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/student" element={<Students />} />
             <Route path="/guardians" element={<Guardians />} />
             <Route path="/drivers" element={<Drivers />} />
             <Route path="/school" element={<School />} />
-            <Route path="/buses" element={<Buses />} />
+            <Route path="/buses" element={<Buses />} /> */}
+            {/* User */}
+             <Route path="/user" element={<User />} />
           </Routes>
         </div>
       </div>
