@@ -10,7 +10,7 @@ import Guardians from "./pages/admin/Guardians.jsx";
 import Drivers from "./pages/admin/Drivers.jsx";
 import School from "./pages/admin/School.jsx";
 import Buses from "./pages/admin/Buses.jsx";
-import User from "./pages/user/Home.jsx";
+import Student from "./pages/user/Students.jsx";
 import SidebarUser from "./components/sidebar/SideBarUser.jsx";
 function App() {
   return (
@@ -28,7 +28,7 @@ function App() {
             <Route path="/school" element={<School />} />
             <Route path="/buses" element={<Buses />} /> */}
             {/* User */}
-             <Route path="/user" element={<User />} />
+             <Route path="/student" element={<Student />} />
           </Routes>
         </div>
       </div>
