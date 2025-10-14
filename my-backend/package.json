@@ -1,6 +1,7 @@
 {
   "name": "nodebasic",
   "version": "1.0.0",
+  "type": "module",
   "description": "",
   "main": "server.js",
   "scripts": {
@@ -23,6 +24,7 @@
     "@babel/preset-env": "7.15.6",
     "app-root-path": "3.0.0",
     "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
     "dotenv": "10.0.0",
     "ejs": "3.1.6",
     "express": "^4.17.1",

@@ -18,7 +18,7 @@ function App() {
         <Sidebar />
         <div className="flex-1 p-4">
           <Routes>
-            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/" element={<Dashboard />} />
             <Route path="/student" element={<Students />} />
             <Route path="/guardians" element={<Guardians />} />
             <Route path="/drivers" element={<Drivers />} />

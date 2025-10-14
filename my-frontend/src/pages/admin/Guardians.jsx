@@ -8,11 +8,18 @@ import { ICONS } from "../../config/ICONS";
 import Header from "../../components/header/Header";
 import { GUARDIAN_TABS } from "../../config/GUARDIAN_TABS";
 import TitlePage from "../../components/title_pages/TitlePage";
+import Button from "../../components/button/Button";
+import api from "../../utils/axios";
+import ButtonsAction from "../../components/buttonsAction/ButtonsAction";
+import DetailModal from "../../components/DetailModal/DetailModal";
+import EditModal from "../../components/EditModal/EditModal";
+import CreateModal from "../../components/CreateModal/CreateModal";
 
 const Guardians = () => {
 
     //icons
     const AddressCardIcon = ICONS.Guardians;
+    const PlusIcon = ICONS.plus;
 
     const [activeTab, setActiveTab] = useState("active");
     const [data, setData] = useState([]);
@@ -23,6 +30,9 @@ const Guardians = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(10);
 
+    const [modalType, setModalType] = useState(null); // null | 'view' | 'edit' | 'delete' | 'create'
+    const [selectedGuardian, setSelectedGuardian] = useState(null);
+
     useEffect(() => {
         fetchDrivers();
     }, [activeTab]);
@@ -30,64 +40,13 @@ const Guardians = () => {
     const fetchDrivers = async () => {
         setLoading(true);
         try {
-            // Tạm thời comment API call
-            // const response = await fetch(`/api/students?status=${activeTab}`);
-            // const result = await response.json();
+            const res = await api.get("/users");
+            // console.log(res);
+            setData(res.data.data || []);
 
-            // Mock data để test
-            const mockData = {
-                active: [
-                    {
-                        id: 1,
-                        name: "Nguyen Van A",
-                        email: "a@example.com",
-                        role: "Parent",
-                        status: "Active",
-                        created: "2024-01-01"
-                    },
-                    {
-                        id: 2,
-                        name: "Tran Thi B",
-                        email: "b@example.com",
-                        role: "Parent",
-                        status: "Active",
-                        created: "2024-01-02"
-                    },
-                    {
-                        id: 3,
-                        name: "Le Van C",
-                        email: "c@example.com",
-                        role: "Guardian",
-                        status: "Active",
-                        created: "2024-02-10"
-                    },
-                ],
-
-                suspended: [
-                    {
-                        id: 4,
-                        name: "Pham Thi D",
-                        email: "d@example.com",
-                        role: "Parent",
-                        status: "Suspended",
-                        created: "2024-03-05"
-                    },
-                    {
-                        id: 5,
-                        name: "Do Van E",
-                        email: "e@example.com",
-                        role: "Guardian",
-                        status: "Suspended",
-                        created: "2024-04-15"
-                    },
-                ],
-            };
-
-
-            setData(mockData[activeTab] || []);
         } catch (error) {
             console.error("Error fetching drivers:", error);
-            setData([]); // Set empty array nếu có lỗi
+            setData([]);
         } finally {
             setLoading(false);
         }
@@ -119,6 +78,37 @@ const Guardians = () => {
         setCurrentPage(1); // Reset về trang 1
     };
 
+    const handleViewGuardians = (guardian) => {
+        setSelectedGuardian(guardian);
+        setModalType('view');
+    };
+
+    const handleEditGuardians = (guardian) => {
+        setSelectedGuardian(guardian);
+        setModalType('edit');
+    };
+
+    const handleDeleteGuardians = (guardian) => {
+        setSelectedGuardian(guardian);
+        setModalType('delete');
+    };
+
+    const handleCreateGuardians = () => {
+        setModalType('create');
+    };
+
+    const handleCloseModal = () => {
+        setModalType(null);
+        setSelectedGuardian(null);
+    };
+
+    const handleSaveEdit = (updatedData) => {
+        console.log("Saving updated data:", updatedData);
+
+
+        handleCloseModal();
+    };
+
     const renderCell = (guardian, key) => {
         switch (key) {
             case "status":
@@ -129,9 +119,16 @@ const Guardians = () => {
                 );
             case "actions":
                 return (
-                    <button className="text-blue-500 hover:text-blue-700">
-                        View
-                    </button>
+                    <div className="flex items-center gap-2">
+
+                        <ButtonsAction
+                            onView={handleViewGuardians}
+                            onEdit={handleEditGuardians}
+                            onDelete={handleDeleteGuardians}
+                            item={guardian}
+                        />
+
+                    </div>
                 );
             default:
                 return guardian[key] || "-";
@@ -144,14 +141,19 @@ const Guardians = () => {
         <>
             <Header />
             <div className="p-6">
-
-                <TitlePage
-                    title="Guardians"
-                    icon={<AddressCardIcon className="text-orange-700" size={30} />}
-                    size="text-2xl"
-                    color="text-gray-700"
-                />
-
+                <div className="flex items-center justify-between">
+                    <TitlePage
+                        title="Guardians"
+                        icon={<AddressCardIcon className="text-orange-700" size={30} />}
+                        size="text-2xl"
+                        color="text-gray-700"
+                    />
+                    <Button
+                        title="CREATE"
+                        icon={<PlusIcon className="text-white" />}
+                        onClick={handleCreateGuardians}
+                    />
+                </div>
                 <Tab tabs={GUARDIAN_TABS} activeTab={activeTab} onTabChange={setActiveTab} />
 
                 <AnimatePresence mode="wait">
@@ -182,8 +184,39 @@ const Guardians = () => {
                             onNext={handleNext}
                         />
                     </motion.div>
+
                 </AnimatePresence>
+
             </div>
+            <AnimatePresence>
+                {modalType === 'view' && (
+                    <DetailModal
+                        item={selectedGuardian}
+                        editModal={handleEditGuardians}
+                        onClose={handleCloseModal}
+                    />
+                )}
+
+                {modalType === 'edit' && (
+                    <EditModal
+                        item={selectedGuardian}
+                        onClose={handleCloseModal}
+                        onSave={handleSaveEdit}
+                    />
+                )}
+
+                {modalType === 'create' && (
+                    <CreateModal
+                        defaultRole="Guardian"
+                        onClose={handleCloseModal}
+                        onSave={handleSaveEdit}
+                    />
+                )}
+
+
+                {/* Modal Delete - Chỉ hiện khi modalType === 'delete' */}
+
+            </AnimatePresence>
         </>
     );
 };

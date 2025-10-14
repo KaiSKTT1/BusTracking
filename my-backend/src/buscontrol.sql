@@ -180,9 +180,6 @@ CREATE TABLE `users` (
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `name`, `phone`, `email`, `password`, `role`, `created_at`) VALUES
-(2, 'Nguyen Van B', '0987654321', 'b@gmail.com', '654321', 'Driver', '2025-10-03 16:51:21');
-
 --
 -- Indexes for dumped tables
 --
@@ -408,3 +405,93 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
+
+-- ======================
+-- 🧍 USERS
+-- ======================
+INSERT INTO `users` (`id`, `name`, `phone`, `email`, `password`, `role`, `created_at`) VALUES
+(1, 'Nguyen Van A', '0912345678', 'a@gmail.com', '123456', 'Admin', NOW()),
+(2, 'Nguyen Van B', '0987654321', 'b@gmail.com', '654321', 'Driver', NOW()),
+(3, 'Tran Thi C', '0977888999', 'c@gmail.com', 'parent123', 'Parent', NOW()),
+(4, 'Le Van D', '0909090909', 'd@gmail.com', 'parent456', 'Parent', NOW());
+
+-- ======================
+-- 🚌 BUS
+-- ======================
+INSERT INTO `bus` (`id`, `license_plate`, `seats`, `driver_id`, `created_at`) VALUES
+(1, '51B-12345', 30, 2, NOW()),
+(2, '51B-67890', 40, NULL, NOW());
+
+-- ======================
+-- 🚏 ROUTES
+-- ======================
+INSERT INTO `routes` (`id`, `name`, `description`) VALUES
+(1, 'Route 1 - District 1 to School', 'Morning and afternoon route for District 1'),
+(2, 'Route 2 - District 5 to School', 'Morning and afternoon route for District 5');
+
+-- ======================
+-- 🕒 SCHEDULES
+-- ======================
+INSERT INTO `schedules` (`id`, `route_id`, `bus_id`, `driver_id`, `start_time`, `end_time`) VALUES
+(1, 1, 1, 2, '2025-10-12 06:30:00', '2025-10-12 07:30:00'),
+(2, 1, 1, 2, '2025-10-12 16:00:00', '2025-10-12 17:00:00'),
+(3, 2, 2, NULL, '2025-10-12 06:45:00', '2025-10-12 07:45:00');
+
+-- ======================
+-- 🚏 STOPS
+-- ======================
+INSERT INTO `stops` (`id`, `route_id`, `stop_name`, `latitude`, `longitude`, `stop_order`) VALUES
+(1, 1, 'Stop 1 - Nguyen Hue', 10.7769, 106.7009, 1),
+(2, 1, 'Stop 2 - Le Loi', 10.7720, 106.6980, 2),
+(3, 1, 'Stop 3 - School Gate', 10.7626, 106.6823, 3),
+(4, 2, 'Stop 1 - Tran Hung Dao', 10.7560, 106.6660, 1),
+(5, 2, 'Stop 2 - Nguyen Trai', 10.7520, 106.6650, 2),
+(6, 2, 'Stop 3 - School Gate', 10.7626, 106.6823, 3);
+
+-- ======================
+-- 👦 STUDENTS
+-- ======================
+INSERT INTO `students` (`id`, `name`, `address`, `parent_id`) VALUES
+(1, 'Nguyen Minh Khang', '123 Nguyen Hue, Q1', 3),
+(2, 'Le Bao Han', '45 Tran Hung Dao, Q5', 4),
+(3, 'Pham Gia Bao', '20 Nguyen Trai, Q5', 4);
+
+-- ======================
+-- 🧭 STUDENTROUTES
+-- ======================
+INSERT INTO `studentroutes` (`id`, `student_id`, `route_id`, `pickup_stop_id`, `dropoff_stop_id`) VALUES
+(1, 1, 1, 1, 3),
+(2, 2, 2, 4, 6),
+(3, 3, 2, 5, 6);
+
+-- ======================
+-- 📍 BUS LOCATIONS (tracking)
+-- ======================
+INSERT INTO `buslocations` (`id`, `bus_id`, `latitude`, `longitude`, `timestamp`) VALUES
+(1, 1, 10.7760, 106.7000, NOW()),
+(2, 1, 10.7720, 106.6980, NOW()),
+(3, 2, 10.7520, 106.6650, NOW());
+
+-- ======================
+-- 🚸 PICKUP STATUS
+-- ======================
+INSERT INTO `pickupstatus` (`id`, `student_id`, `schedule_id`, `status`, `timestamp`) VALUES
+(1, 1, 1, 'PickedUp', NOW()),
+(2, 2, 3, 'Absent', NOW()),
+(3, 3, 3, 'DroppedOff', NOW());
+
+-- ======================
+-- ✉️ MESSAGES
+-- ======================
+INSERT INTO `messages` (`id`, `sender_id`, `receiver_id`, `content`, `sent_at`) VALUES
+(1, 3, 2, 'Driver, please confirm pickup time.', NOW()),
+(2, 2, 3, 'We will arrive at 6:40 AM.', NOW());
+
+-- ======================
+-- 🔔 NOTIFICATIONS
+-- ======================
+INSERT INTO `notifications` (`id`, `user_id`, `message`, `type`, `created_at`) VALUES
+(1, 3, 'Your child has been picked up.', 'Info', NOW()),
+(2, 4, 'Your child is absent today.', 'Warning', NOW()),
+(3, 2, 'Bus maintenance due next week.', 'Alert', NOW());

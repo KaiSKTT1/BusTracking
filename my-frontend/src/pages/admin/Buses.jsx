@@ -99,7 +99,7 @@ const Buses = () => {
 
                 <div className="flex items-center justify-between mb-6">
                     <TitlePage
-                        title="Guardians"
+                        title="Buses"
                         icon={<AddressCardIcon className="text-orange-700" size={30} />}
                         size="text-2xl"
                         color="text-gray-700"

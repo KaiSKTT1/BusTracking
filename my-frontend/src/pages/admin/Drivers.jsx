@@ -8,11 +8,16 @@ import { ICONS } from "../../config/ICONS";
 import Header from "../../components/header/Header";
 import { DRIVER_TABS } from "../../config/DRIVER_TABS";
 import TitlePage from "../../components/title_pages/TitlePage";
+import Button from "../../components/button/Button";
+import ButtonsAction from "../../components/buttonsAction/ButtonsAction";
+import DetailModal from "../../components/DetailModal/DetailModal";
+import EditModal from "../../components/EditModal/EditModal";
 
 const Drivers = () => {
 
     //icons
     const AddressCardIcon = ICONS.Drivers;
+    const PlusIcon = ICONS.plus;
 
     const [activeTab, setActiveTab] = useState("active");
     const [data, setData] = useState([]);
@@ -22,6 +27,9 @@ const Drivers = () => {
     //State cho pagination
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(10);
+
+    const [modalType, setModalType] = useState(null); // null | 'view' | 'edit' | 'delete'
+    const [selectedDriver, setSelectedDriver] = useState(null);
 
     useEffect(() => {
         fetchDrivers();
@@ -137,6 +145,31 @@ const Drivers = () => {
         setCurrentPage(1); // Reset về trang 1
     };
 
+    const handleViewDriver = (driver) => {
+        setSelectedDriver(driver);
+        setModalType('view');
+    };
+    const handleEditDriver = (driver) => {
+        setSelectedDriver(driver);
+        setModalType('edit');
+    };
+    const handleDeleteDriver = (driver) => {
+        setSelectedDriver(driver);
+        setModalType('delete');
+    };
+
+    const handleCloseModal = () => {
+        setModalType(null);
+        setSelectedDriver(null);
+    };
+
+    const handleSaveEdit = (updatedData) => {
+        console.log("Saving updated data:", updatedData);
+
+
+        handleCloseModal();
+    };
+
     const renderCell = (driver, key) => {
         switch (key) {
             case "status":
@@ -147,9 +180,14 @@ const Drivers = () => {
                 );
             case "actions":
                 return (
-                    <button className="text-blue-500 hover:text-blue-700">
-                        View
-                    </button>
+                    <div className="flex items-center gap-2">
+                        <ButtonsAction
+                            onView={handleViewDriver}
+                            onEdit={handleEditDriver}
+                            onDelete={handleDeleteDriver}
+                            item={driver}
+                        />
+                    </div>
                 );
             default:
                 return driver[key] || "-";
@@ -162,13 +200,15 @@ const Drivers = () => {
         <>
             <Header />
             <div className="p-6">
-
-                <TitlePage
-                    title="Guardians"
-                    icon={<AddressCardIcon className="text-orange-700" size={30} />}
-                    size="text-2xl"
-                    color="text-gray-700"
-                />
+                <div className="flex items-center justify-between">
+                    <TitlePage
+                        title="Guardians"
+                        icon={<AddressCardIcon className="text-orange-700" size={30} />}
+                        size="text-2xl"
+                        color="text-gray-700"
+                    />
+                    <Button title="CREATE" icon={<PlusIcon className="text-white" />} />
+                </div>
 
                 <Tab tabs={DRIVER_TABS} activeTab={activeTab} onTabChange={setActiveTab} />
 
@@ -202,6 +242,23 @@ const Drivers = () => {
                     </motion.div>
                 </AnimatePresence>
             </div>
+            <AnimatePresence>
+                {modalType === 'view' && (
+                    <DetailModal
+                        item={selectedDriver}
+                        editModal={handleEditDriver}
+                        onClose={handleCloseModal}
+                    />
+                )}
+
+                {modalType === 'edit' && (
+                    <EditModal
+                        item={selectedDriver}
+                        onClose={handleCloseModal}
+                        onSave={handleSaveEdit}
+                    />
+                )}
+            </AnimatePresence>
         </>
     );
 };

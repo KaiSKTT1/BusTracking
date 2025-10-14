@@ -12,12 +12,12 @@ const Sidebar = () => {
                 </div>
 
                 <nav className="flex flex-col space-y-2">
-                    <ItemSidebar href="dashboard" title="Dashboard" size="text-lg" />
+                    <ItemSidebar href="" title="Dashboard" size="text-lg" />
                     <ItemSidebar href="student" title="Students" size="text-lg" />
                     <ItemSidebar href="guardians" title="Guardians" size="text-lg" />
                     <ItemSidebar href="drivers" title="Drivers" size="text-lg" />
                     <ItemSidebar href="school" title="School" size="text-lg" />
-                     <ItemSidebar href="buses" title="Buses" size="text-lg" />
+                    <ItemSidebar href="buses" title="Buses" size="text-lg" />
                 </nav>
             </div>
         </div>
