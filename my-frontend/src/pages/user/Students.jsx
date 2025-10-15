@@ -6,8 +6,11 @@ import { STUDENT_TABS } from "../../config/STUDENT_TABS";
 import Button from "../../components/button/Button";
 import SearchBar from "../../components/table/SearchBar";
 import Table from "../../components/table/Table";
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
+import "leaflet/dist/leaflet.css";
+import "leaflet-routing-machine/dist/leaflet-routing-machine.css";
+import "leaflet-routing-machine";
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import L from "leaflet";
 
 const Students = () => {
     
@@ -76,20 +79,50 @@ const mockData = {
         fetchStudents();
     }, [activeTab]);
 
-    const MapComponent = ({ student }) => {
-    const x = 10.762622 + (Math.random() - 0.5) * 0.1;
-    const y = 106.660172 + (Math.random() - 0.5) * 0.1;
-    
+    const Routing = ({ start, end }) => {
+        const map = useMap();
 
-    return (
-        <MapContainer center={[x, y]} zoom={13} style={{ height: "400px", width: "100%" }}>
-            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-            <Marker position={[x, y]}>
-                <Popup>{student.name}</Popup>
-            </Marker>
-        </MapContainer>
-    );
-};
+        useEffect(() => {
+            if (!map || !start || !end) return;
+
+            const routingControl = L.Routing.control({
+                waypoints: [
+                    L.latLng(start[0], start[1]),
+                    L.latLng(end[0], end[1]),
+                ],
+                lineOptions: {
+                    styles: [{ color: "blue", weight: 5 }],
+                },
+                show: false,
+                addWaypoints: false,
+                draggableWaypoints: false,
+            }).addTo(map);
+
+            return () => map.removeControl(routingControl);
+        }, [map, start, end]);
+
+        return null;
+    };
+
+    // 🗺️ Component hiển thị bản đồ
+    const MapComponent = ({ student }) => {
+        const start = [10.762622, 106.660172]; // ví dụ: trường học
+        const end = [student.lat, student.lng]; // vị trí của học sinh
+
+        return (
+            <MapContainer center={start} zoom={13} style={{ height: "400px", width: "100%" }}>
+                <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                <Marker position={start}>
+                    <Popup>Điểm bắt đầu (Trường học)</Popup>
+                </Marker>
+                <Marker position={end}>
+                    <Popup>{student.name}</Popup>
+                </Marker>
+                <Routing start={start} end={end} />
+            </MapContainer>
+        );
+    };
+
         return (
             <>
                 <Header />
