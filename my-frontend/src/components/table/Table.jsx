@@ -1,4 +1,4 @@
-const Table = ({ loading, data, columns, renderCell }) => (
+const Table = ({ loading, data, columns, renderCell, funct }) => (
     <div className="overflow-x-auto">
         <table className="w-full">
             {/* Header */}
@@ -24,7 +24,7 @@ const Table = ({ loading, data, columns, renderCell }) => (
                     <EmptyRow colSpan={columns.length} text="No data available" />
                 ) : (
                     data.map((item) => (
-                        <tr key={item.id} className="hover:bg-gray-50">
+                        <tr key={item.id} className="hover:bg-gray-50" onClick={() => funct(item)}>
                             {columns.map((col) => (
                                 <td
                                     key={col.key}
