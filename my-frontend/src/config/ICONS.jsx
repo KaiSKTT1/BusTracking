@@ -1,4 +1,5 @@
 // src/config/icons.js
+import { FaBell } from "react-icons/fa";
 import { AiFillGold, AiOutlineDollarCircle } from "react-icons/ai";
 import { FiXOctagon } from "react-icons/fi";
 import { FaAddressCard } from "react-icons/fa6";
@@ -12,8 +13,9 @@ import { FaHouse } from "react-icons/fa6";
 import { FaGraduationCap } from "react-icons/fa";
 import { FaBusAlt } from "react-icons/fa";
 import { FaPlus } from "react-icons/fa6";
-import { IoIosNotifications } from "react-icons/io";
-import { IoIosInformationCircle } from "react-icons/io";
+import { FaEye } from "react-icons/fa";
+import { FaPencil } from "react-icons/fa6";
+import { MdCancel } from "react-icons/md";
 
 export const ICONS = {
     Dashboard: FaHouse, //Icon cho item nav Dashboard
@@ -30,6 +32,9 @@ export const ICONS = {
     School: FaGraduationCap, //Icon cho item nav School
     Buses: FaBusAlt, //Icon cho item nav Buses
     plus: FaPlus,
-    Notifications: IoIosNotifications,
-    Infor: IoIosInformationCircle,
+    eye: FaEye, //Action icon view
+    pencil: FaPencil,//Action icon edit
+    cancel: MdCancel,//Action icon delete
+    bell: FaBell,
+
 };
