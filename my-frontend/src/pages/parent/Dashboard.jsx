@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import TitlePage from "../../components/title_pages/TitlePage";
 import Header from "../../components/header/Header";
 import { ICONS } from "../../config/ICONS";
@@ -9,8 +9,7 @@ import Table from "../../components/table/Table";
 import "leaflet/dist/leaflet.css";
 import "leaflet-routing-machine/dist/leaflet-routing-machine.css";
 import "leaflet-routing-machine";
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
-import L, { routing } from "leaflet";
+
 import MapView from "../../components/map/MapView";
 
 const Students = () => {
@@ -31,8 +30,8 @@ const Students = () => {
     const [rowsPerPage, setRowsPerPage] = useState(5);   // số dòng mỗi trang
 
     const [selectedStudent, setSelectedStudent] = useState(null);
-
-
+    const [currentPosition, setCurrentPosition] = useState(null); // Vị trí mặc định (HCM)
+    const [index, setIndex] = useState(0);
 
     const fetchStudents = async () => {
         try {
@@ -79,59 +78,12 @@ const Students = () => {
 
     const handleRowClick = (student) => {
         setSelectedStudent(student);
+        setCurrentPosition({ lat: student.lat, lng: student.lng })
     };
 
 
-    const Routing = ({ start, end }) => {
-        const map = useMap();
+    
 
-        useEffect(() => {
-            if (!map || !start || !end) return;
-
-            const routingControl = L.Routing.control({
-                waypoints: [
-                    L.latLng(start[0], start[1]),
-                    L.latLng(end[0], end[1]),
-                ],
-                lineOptions: {
-                    styles: [{ color: "blue", weight: 5 }],
-                },
-                show: false,
-                addWaypoints: false,
-                draggableWaypoints: false,
-            });
-            routingControl.addTo(map);
-
-            routingControl.on("routesfound", (e) => {
-                const arrPos = e.routes[0].coordinates;
-                const currentPos = { lat: start[0], lng: start[1] };
-                const index = 0;
-                console.log("Current position index in route:", index);
-                // console.log("Routing from", start, "to", end);
-                if (index != -1) {
-                    const newIndex = index + 1;
-                    const newLat = arrPos[newIndex].lat;
-                    const newLng = arrPos[newIndex].lng;
-                    console.log("Updating position to:", newLat, newLng);
-                    setSelectedStudent({
-                        ...selectedStudent,
-                        lat: newLat,
-                        lng: newLng
-                    });
-                    start= [newLat, newLng];
-                    arrPos = arrPos.slice(newIndex);
-                    
-                }
-            })
-            
-
-            return () => map.removeControl(routingControl);
-        }, [map, start, end, selectedStudent]);
-
-        return null;
-    };
-
-    // 🗺️ Component hiển thị bản đồ
     return (
         <>
             <Header />
@@ -151,7 +103,7 @@ const Students = () => {
                 />
                 <div className="flex justify-center mt= 4 h-[400px]">
                     {selectedStudent && (
-                        <MapView position={[selectedStudent.lat, selectedStudent.lng]} Routing={Routing} />
+                        <MapView position={[selectedStudent.lat, selectedStudent.lng]} currentPosition={currentPosition} />
                     )}
                 </div>
             </div>
