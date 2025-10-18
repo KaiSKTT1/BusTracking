@@ -10,19 +10,20 @@ import "leaflet/dist/leaflet.css";
 import "leaflet-routing-machine/dist/leaflet-routing-machine.css";
 import "leaflet-routing-machine";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
-import L from "leaflet";
+import L, { routing } from "leaflet";
+import MapView from "../../components/map/MapView";
 
 const Students = () => {
-    
-const mockData = {
-    active: [
-        { id: 1, name: "John Doe", age: 16, grade: "10th", status: "active", lat: 10.762622, lng: 106.660172 },
-        { id: 2, name: "Jane Smith", age: 17, grade: "11th", status: "active", lat: 10.776889, lng: 106.700806 },
-    ],
-    inactive: [
-        { id: 3, name: "Mike Johnson", age: 18, grade: "12th", status: "inactive", lat: 21.028511, lng: 105.804817 },
-    ],
-};
+
+    const mockData = {
+        active: [
+            { id: 1, name: "John Doe", age: 16, grade: "10th", status: "active", lat: 10.762622, lng: 106.660172 },
+            { id: 2, name: "Jane Smith", age: 17, grade: "11th", status: "active", lat: 10.776889, lng: 106.700806 },
+        ],
+        inactive: [
+            { id: 3, name: "Mike Johnson", age: 18, grade: "12th", status: "inactive", lat: 21.028511, lng: 105.804817 },
+        ],
+    };
     const [activeTab, setActiveTab] = useState("active");
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -31,20 +32,17 @@ const mockData = {
 
     const [selectedStudent, setSelectedStudent] = useState(null);
 
-    const handleRowClick = (student) => {
-        setSelectedStudent(student);
-    };
 
-    
+
     const fetchStudents = async () => {
-        try{
+        try {
             setData(mockData[activeTab] || []);
         }
-        catch(error){
+        catch (error) {
             console.error("Error fetching students:", error);
             setData([]);
         }
-        finally{
+        finally {
             setLoading(false);
         }
     }
@@ -79,6 +77,11 @@ const mockData = {
         fetchStudents();
     }, [activeTab]);
 
+    const handleRowClick = (student) => {
+        setSelectedStudent(student);
+    };
+
+
     const Routing = ({ start, end }) => {
         const map = useMap();
 
@@ -96,55 +99,63 @@ const mockData = {
                 show: false,
                 addWaypoints: false,
                 draggableWaypoints: false,
-            }).addTo(map);
+            });
+            routingControl.addTo(map);
+
+            routingControl.on("routesfound", (e) => {
+                const arrPos = e.routes[0].coordinates;
+                const currentPos = { lat: start[0], lng: start[1] };
+                const index = 0;
+                console.log("Current position index in route:", index);
+                // console.log("Routing from", start, "to", end);
+                if (index != -1) {
+                    const newIndex = index + 1;
+                    const newLat = arrPos[newIndex].lat;
+                    const newLng = arrPos[newIndex].lng;
+                    console.log("Updating position to:", newLat, newLng);
+                    setSelectedStudent({
+                        ...selectedStudent,
+                        lat: newLat,
+                        lng: newLng
+                    });
+                    start= [newLat, newLng];
+                    arrPos = arrPos.slice(newIndex);
+                    
+                }
+            })
+            
 
             return () => map.removeControl(routingControl);
-        }, [map, start, end]);
+        }, [map, start, end, selectedStudent]);
 
         return null;
     };
 
     // 🗺️ Component hiển thị bản đồ
-    const MapComponent = ({ student }) => {
-        const start = [10.762622, 106.660172]; // ví dụ: trường học
-        const end = [student.lat, student.lng]; // vị trí của học sinh
-
-        return (
-            <MapContainer center={start} zoom={13} style={{ height: "400px", width: "100%" }}>
-                <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                <Marker position={start}>
-                    <Popup>Điểm bắt đầu (Trường học)</Popup>
-                </Marker>
-                <Marker position={end}>
-                    <Popup>{student.name}</Popup>
-                </Marker>
-                <Routing start={start} end={end} />
-            </MapContainer>
-        );
-    };
-
-        return (
-            <>
-                <Header />
-                <div className="container">
-                    <div className="flex items-center justify-between">
-                        <TitlePage title="Students" icon={<ICONS.Students />} size="text-2xl"
-                    color="text-gray-700" />
-                        <Button title="Add Student" icon={<ICONS.plus />} />
-                    </div>
-                    <SearchBar />
-                    <Table
-                            loading={loading}
-                            data={currentData}  //Dùng paginatedData thay vì filteredData
-                            columns={currentColumns}
-                            renderCell={renderCell}
-                            funct={handleRowClick}
-                        />
-                    {selectedStudent && (
-                    <MapComponent student={selectedStudent} />
-                )}
+    return (
+        <>
+            <Header />
+            <div className="container">
+                <div className="flex items-center justify-between">
+                    <TitlePage title="Students" icon={<ICONS.Students />} size="text-2xl"
+                        color="text-gray-700" />
+                    <Button title="Add Student" icon={<ICONS.plus />} />
                 </div>
-            </>
-        );
+                <SearchBar />
+                <Table
+                    loading={loading}
+                    data={currentData}  //Dùng paginatedData thay vì filteredData
+                    columns={currentColumns}
+                    renderCell={renderCell}
+                    funct={handleRowClick}
+                />
+                <div className="flex justify-center mt= 4 h-[400px]">
+                    {selectedStudent && (
+                        <MapView position={[selectedStudent.lat, selectedStudent.lng]} Routing={Routing} />
+                    )}
+                </div>
+            </div>
+        </>
+    );
 }
 export default Students;

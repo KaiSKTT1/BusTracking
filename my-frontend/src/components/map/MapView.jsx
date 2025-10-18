@@ -1,7 +1,8 @@
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import MapUpdater from "../../hooks/MapUpdate";
+import "leaflet/dist/leaflet.css";
 
-const MapView = ({ position }) => {
+const MapView = ({ position, Routing }) => {
   return (
     <MapContainer
       key={`${position[0]}-${position[1]}`}
@@ -17,7 +18,9 @@ const MapView = ({ position }) => {
         <Popup>Vị trí của bạn</Popup>
       </Marker>
 
-      <MapUpdater position={position} />
+      {/* <MapUpdater position={position} /> */}
+      {console.log("MapView position:", position)};
+      <Routing start={[position[0],position[1]]} end={[10.7554, 106.6784]}/>
     </MapContainer>
   );
 };
