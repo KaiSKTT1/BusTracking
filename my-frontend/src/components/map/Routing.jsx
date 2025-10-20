@@ -35,14 +35,15 @@ const Routing = ({ start, end }) => {
 
     }, [map, start, end]);
     useEffect(() => {
+        if (!routePoints) return
         const interval = setInterval(() => {
-            if (routePoints.length === 0 || index > routePoints.length) return;
+            if (!routePoints && (routePoints.length === 0 || index >= routePoints.length)) return;
             setIndex(index => index + 1)
             return () => {clearInterval(interval)};
-        }, 1000)}, [routePoints]);
+        }, 100)}, [routePoints]);
     return (
         <> 
-        {routePoints &&  
+        {routePoints &&  index < routePoints.length &&
             <Marker
             
           position={[
