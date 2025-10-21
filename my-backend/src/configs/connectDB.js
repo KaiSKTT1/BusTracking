@@ -10,9 +10,9 @@ const pool = mysql.createPool({
     // database: 'buscontrol',
     // password: 'password'
     host: 'localhost',
-    user: 'hbstudent',
-    database: 'buscontrol',
-    password: 'hbstudent'
+    user: 'root',
+    database: 'bus_tracking',
+    password: ''
 })
 
 

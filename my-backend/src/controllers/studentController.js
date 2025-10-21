@@ -2,8 +2,21 @@ import pool from "../configs/connectDB.js";
 
 let getAllStudents = async (req, res) => {
     try {
-        const [rows] = await pool.execute("SELECT * FROM Students");
+        const [rows] = await pool.execute("SELECT * FROM Student");
         return res.status(200).json(rows);
+    } catch (err) {
+        return res.status(500).json({ message: err.message });
+    }
+};
+
+let getStudentById = async (req, res) => {
+    let { id } = req.params;
+    try {
+        const [rows] = await pool.execute("SELECT * FROM Student WHERE student_id = ?", [id]);
+        if (rows.length === 0) {
+            return res.status(404).json({ message: "Student not found" });
+        }
+        return res.status(200).json(rows[0]);
     } catch (err) {
         return res.status(500).json({ message: err.message });
     }
@@ -18,7 +31,7 @@ let createStudent = async (req, res) => {
 
     try {
         await pool.execute(
-            `INSERT INTO Students (name, address, parent_id) VALUES (?, ?, ?)`,
+            `INSERT INTO Student (name, address, parent_id) VALUES (?, ?, ?)`,
             [name, address || null, parent_id || null]
         );
         return res.status(201).json({ message: "Student created" });
@@ -37,7 +50,7 @@ let updateStudent = async (req, res) => {
 
     try {
         await pool.execute(
-            `UPDATE Students SET name = ?, address = ?, parent_id = ? WHERE id = ?`,
+            `UPDATE Student SET name = ?, address = ?, parent_id = ? WHERE id = ?`,
             [name, address || null, parent_id || null, id]
         );
         return res.status(200).json({ message: "Student updated" });
@@ -54,7 +67,7 @@ let deleteStudent = async (req, res) => {
     }
 
     try {
-        await pool.execute(`DELETE FROM Students WHERE id = ?`, [id]);
+        await pool.execute(`DELETE FROM Student WHERE id = ?`, [id]);
         return res.status(200).json({ message: "Student deleted" });
     } catch (err) {
         return res.status(500).json({ message: err.message });
@@ -63,6 +76,7 @@ let deleteStudent = async (req, res) => {
 
 export default {
     getAllStudents,
+    getStudentById,
     createStudent,
     updateStudent,
     deleteStudent,

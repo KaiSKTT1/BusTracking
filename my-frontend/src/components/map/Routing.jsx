@@ -35,40 +35,40 @@
 
         }, [map, start, end]);
 
-        // useEffect(() => {
-        //     if (!routePoints) return
-        //     const interval = setInterval(() => {
-        //         if (!routePoints && (routePoints.length === 0 || index >= routePoints.length)) return;
-        //         setIndex(index => index + 1)
-        //         return () => {clearInterval(interval)};
-        //     }, 100)}, [routePoints]);
-
         useEffect(() => {
-            const watchId = navigator.geolocation.watchPosition(
-                pos => {
-                    const { latitude, longitude } = pos.coords;
-                    setRealPosition([latitude, longitude]);
-                    console.log("Vị trí thực tế:", realPosition);
-                },
-                err => console.error(err),
-                { enableHighAccuracy: true, maximumAge: 1000, timeout: 10000 }
-            );
+            if (!routePoints) return
+            const interval = setInterval(() => {
+                if (!routePoints && (routePoints.length === 0 || index >= routePoints.length)) return;
+                setIndex(index => index + 1)
+                return () => {clearInterval(interval)};
+            }, 1000)}, [routePoints]);
 
-            return () => navigator.geolocation.clearWatch(watchId);
-        }, [routePoints]);
+        // useEffect(() => {
+        //     const watchId = navigator.geolocation.watchPosition(
+        //         pos => {
+        //             const { latitude, longitude } = pos.coords;
+        //             setRealPosition([latitude, longitude]);
+        //             console.log("Vị trí thực tế:", realPosition);
+        //         },
+        //         err => console.error(err),
+        //         { enableHighAccuracy: true, maximumAge: 1000, timeout: 10000 }
+        //     );
+
+        //     return () => navigator.geolocation.clearWatch(watchId);
+        // }, [routePoints]);
 
 
         return (
             <>
-                {/* {routePoints && index < routePoints.length &&
+                {routePoints && index < routePoints.length &&
                     <Marker
 
-                        position={[routePoints[0].lat, routePoints[0].lng]}
-                    />} */}
-                {realPosition &&
+                        position={[routePoints[index].lat, routePoints[index].lng]}
+                    />}
+                {/* {realPosition &&
                     <Marker position={realPosition}>
                         <Popup>Vị trí thực tế của bạn</Popup>
-                    </Marker>}
+                    </Marker>} */}
             </>
         );
     };
