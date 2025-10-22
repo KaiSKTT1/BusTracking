@@ -1,30 +1,32 @@
 import React from "react";
 import "./Sidebar.css";
-import logo from "../../assets/react.svg";
+import logo from "../../assets/react.svg"
 import ItemSidebar from "../item_sidebar/ItemSidebar";
 
-const Sidebar = () => {
-  return (
-    <div className="flex">
-      <div className="w-64 h-screen bg-blue-600 text-white flex flex-col p-4">
-        <div className="flex justify-center mb-6">
-          <img src={logo} alt="Logo" className="w-16 h-16" />
+const SidebarDrivers = () => {
+    return (
+        <div className="flex">
+            <div className="w-64 h-screen bg-blue-600 text-white flex flex-col p-4">
+                <div className="flex justify-center mb-6">
+                    <img src={logo} alt="Logo" className="w-16 h-16" />
+                </div>
+
+                <nav className="flex flex-col space-y-2">
+
+                    <ItemSidebar href="driver/pickupdropoff" title="PickupDropoff" size="text-lg" />
+                    <ItemSidebar href="driver/schedules" title="Schedules" size="text-lg" />
+                    <ItemSidebar href="driver/report" title="Notify" size="text-lg" />
+
+                </nav>
+            </div>
         </div>
 
-        <nav className="flex flex-col space-y-2">
-          <ItemSidebar href="admin/dashboard" title="Dashboard" size="text-lg" />
-          <ItemSidebar href="admin/student" title="Students" size="text-lg" />
-          <ItemSidebar href="admin/guardians" title="Guardians" size="text-lg" />
-          <ItemSidebar href="admin/drivers" title="Drivers" size="text-lg" />
-          <ItemSidebar href="admin/school" title="School" size="text-lg" />
-          <ItemSidebar href="admin/buses" title="Buses" size="text-lg" />
-        </nav>
-      </div>
-    </div>
-  );
-};
+    );
+}
 
-export default Sidebar;
+
+
+export default SidebarDrivers;
 
 // import React, { useState } from "react";
 // import "./Sidebar.css";

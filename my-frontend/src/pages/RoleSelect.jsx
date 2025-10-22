@@ -26,6 +26,14 @@ export default function RoleSelect() {
           <span className="text-5xl mb-2">👨‍👩‍👧</span>
           <span className="font-semibold text-lg text-green-600">Parent</span>
         </button>
+
+        <button
+          onClick={() => navigate("/driver/login")}
+          className="w-48 h-40 bg-white border-2 border-green-500 rounded-2xl shadow-md hover:shadow-lg hover:bg-green-50 flex flex-col items-center justify-center transition"
+        >
+          <span className="text-5xl mb-2">🧑‍💼</span>
+          <span className="font-semibold text-lg text-green-600">Driver</span>
+        </button>
       </div>
 
       <footer className="mt-12 text-sm text-gray-500">

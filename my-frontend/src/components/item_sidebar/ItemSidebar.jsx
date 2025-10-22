@@ -6,7 +6,10 @@ const ItemSidebar = ({ href, title, size }) => {
     const IconComponent = ICONS[title];
     const location = useLocation();
 
-    const isActive = location.pathname === `/${href}`;
+    //const isActive = location.pathname === `/${href}`;
+    const isActive =
+        location.pathname === `/${href}` ||
+        location.pathname.startsWith(`/${href}/`);
 
     return (
         <div

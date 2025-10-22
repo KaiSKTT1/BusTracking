@@ -16,6 +16,9 @@ import { FaPlus } from "react-icons/fa6";
 import { FaEye } from "react-icons/fa";
 import { FaPencil } from "react-icons/fa6";
 import { MdCancel } from "react-icons/md";
+import { FaCalendarAlt } from "react-icons/fa";
+import { FaBullhorn } from "react-icons/fa";
+import { FaShuttleVan } from "react-icons/fa";
 
 export const ICONS = {
     Dashboard: FaHouse, //Icon cho item nav Dashboard
@@ -36,5 +39,8 @@ export const ICONS = {
     pencil: FaPencil,//Action icon edit
     cancel: MdCancel,//Action icon delete
     bell: FaBell,
+    Schedules: FaCalendarAlt,
+    Notify: FaBullhorn,
+    PickupDropoff: FaShuttleVan,
 
 };

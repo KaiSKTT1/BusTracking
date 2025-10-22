@@ -12,7 +12,7 @@ export default function AdminLogin() {
       // Lưu trạng thái đăng nhập vào localStorage
       localStorage.setItem("adminLoggedIn", "true");
       // Chuyển hướng tới dashboard của Admin
-      navigate("/dashboard");
+      navigate("/admin/dashboard");
     } else {
       alert("Sai email hoặc mật khẩu! (demo: admin@gmail.com / admin123)");
     }
