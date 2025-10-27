@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import avatar from "../../assets/image/avatar-default.png";
+import { formatDate } from "../../utils/dateFormat.jsx";
 
 // Component Modal chỉnh sửa
 const EditModal = ({ item, onClose, onSave }) => {
@@ -14,8 +15,8 @@ const EditModal = ({ item, onClose, onSave }) => {
         phone: item.phone || item.parentPhone || "",
         role: item.role || "Student",
         status: item.status || "Active",
-        // Linh hoạt: tìm registered HOẶC created
-        registered: item.registered || item.created || ""
+        // Linh hoạt: tìm registered HOẶC created HOẶC created_at, và format
+        registered: formatDate(item.registered || item.created || item.created_at)
     });
 
     // Xử lý thay đổi input

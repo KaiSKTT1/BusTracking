@@ -2,12 +2,13 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import avatar from "../../assets/image/avatar-default.png";
 
-const CreateModal = ({ onClose, onSave, defaultRole }) => {
+const CreateModal = ({ onClose, onSave, defaultRole, requirePassword = false }) => {
     // Khởi tạo form, role mặc định sẽ đến từ props
     const [formData, setFormData] = useState({
         name: "",
         email: "",
         phone: "",
+        password: "",
         role: defaultRole || "",
         status: "Active",
     });
@@ -97,6 +98,22 @@ const CreateModal = ({ onClose, onSave, defaultRole }) => {
                                     placeholder="Enter phone number"
                                 />
                             </div>
+
+                            {/* Chỉ hiện password field nếu requirePassword = true */}
+                            {requirePassword && (
+                                <div>
+                                    <label className="text-sm text-gray-600 block mb-1">Password</label>
+                                    <input
+                                        type="password"
+                                        name="password"
+                                        value={formData.password}
+                                        onChange={handleChange}
+                                        className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-orange-400"
+                                        placeholder="Enter password"
+                                        required
+                                    />
+                                </div>
+                            )}
 
                             {/* Ẩn role đi vì nó cố định cho từng trang */}
                             <input type="hidden" name="role" value={formData.role} />

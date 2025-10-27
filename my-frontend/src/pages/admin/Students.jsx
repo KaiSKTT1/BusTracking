@@ -4,6 +4,7 @@ import SearchBar from "../../components/table/SearchBar";
 import Table from "../../components/table/Table";
 import Pagination from "../../components/table/Pagination";
 import Tab from "../../components/tabs/Tab";
+import Button from "../../components/button/Button";
 import { STUDENT_TABS } from "../../config/STUDENT_TABS";
 import { ICONS } from "../../config/ICONS";
 import TitlePage from "../../components/title_pages/TitlePage";
@@ -13,11 +14,13 @@ import CreateModal from "../../components/CreateModal/CreateModal";
 import DeleteModal from "../../components/DeleteModal/DeleteModal";
 import ButtonsAction from "../../components/buttonsAction/ButtonsAction";
 import api from "../../utils/axios";
+import { formatDate } from "../../utils/dateFormat.jsx";
 import toast from "react-hot-toast";
 
 const Students = () => {
   //icons
   const AddressCardIcon = ICONS.Students;
+  const PlusIcon = ICONS.plus;
 
   const [activeTab, setActiveTab] = useState("active");
   const [data, setData] = useState([]);
@@ -180,16 +183,16 @@ const Students = () => {
             {student[key]}
           </span>
         );
+      case "created":
+        return formatDate(student[key]) || "-";
       case "actions":
         return (
-          <div className="flex gap-2 justify-center">
-            <ButtonsAction
-              item={student}
-              onView={handleView}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
-            />
-          </div>
+          <ButtonsAction
+            item={student}
+            onView={handleView}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
         );
       default:
         return student[key] || "-";
@@ -208,13 +211,11 @@ const Students = () => {
             size="text-2xl"
             color="text-gray-700"
           />
-          <button
+          <Button
+            title="Add New Student"
+            icon={<PlusIcon className="text-white" size={18} />}
             onClick={() => setShowCreateModal(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors"
-          >
-            <span className="text-xl">+</span>
-            Add Student
-          </button>
+          />
         </div>
 
         <Tab
@@ -285,6 +286,7 @@ const Students = () => {
               onClose={() => setShowCreateModal(false)}
               onSave={handleCreateStudent}
               defaultRole="Student"
+              requirePassword={false}
             />
           )}
         </AnimatePresence>
