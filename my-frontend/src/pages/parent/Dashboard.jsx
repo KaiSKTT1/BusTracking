@@ -7,8 +7,8 @@ import Button from "../../components/button/Button";
 import SearchBar from "../../components/table/SearchBar";
 import Table from "../../components/table/Table";
 import "leaflet/dist/leaflet.css";
-import "leaflet-routing-machine/dist/leaflet-routing-machine.css";
-import "leaflet-routing-machine";
+// import "leaflet-routing-machine/dist/leaflet-routing-machine.css";
+// import "leaflet-routing-machine";
 
 import MapView from "../../components/map/MapView";
 

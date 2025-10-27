@@ -9,11 +9,13 @@ const EditModal = ({ item, onClose, onSave }) => {
     // State để quản lý form data
     const [formData, setFormData] = useState({
         name: item.name || "",
-        email: item.email || "",
-        phone: item.phone || "",
+        // Linh hoạt: tìm email HOẶC parentEmail
+        email: item.email || item.parentEmail || "",
+        phone: item.phone || item.parentPhone || "",
         role: item.role || "Student",
         status: item.status || "Active",
-        registered: item.registered || ""
+        // Linh hoạt: tìm registered HOẶC created
+        registered: item.registered || item.created || ""
     });
 
     // Xử lý thay đổi input
@@ -56,7 +58,7 @@ const EditModal = ({ item, onClose, onSave }) => {
                         >
                             Back
                         </button>
-                    </div>      
+                    </div>
                 </div>
 
                 {/* Content */}
@@ -93,10 +95,10 @@ const EditModal = ({ item, onClose, onSave }) => {
                                 />
                             </div>
 
-                            {/* Email Parent */}
+                            {/* Email */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Email Parent
+                                    Email
                                 </label>
                                 <input
                                     type="email"
@@ -108,10 +110,10 @@ const EditModal = ({ item, onClose, onSave }) => {
                                 />
                             </div>
 
-                            {/* Phone Parent */}
+                            {/* Phone */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Phone Parent
+                                    Phone
                                 </label>
                                 <input
                                     type="tel"

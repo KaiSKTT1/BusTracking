@@ -65,27 +65,27 @@ const DetailModal = ({ item, onClose, editModal }) => {
 
                             {/* Email */}
                             <div>
-                                <p className="text-sm text-gray-500 mb-1">Email Parent</p>
-                                <p className="font-semibold text-gray-800 text-lg">{item.email}</p>
+                                <p className="text-sm text-gray-500 mb-1">Email</p>
+                                <p className="font-semibold text-gray-800 text-lg">{item.email || item.parentEmail || "N/A"}</p>
                             </div>
 
                             {/* Registered */}
                             <div>
                                 <p className="text-sm text-gray-500 mb-1">Registered</p>
-                                <p className="font-medium text-gray-800">{item.registered}</p>
+                                <p className="font-medium text-gray-800">{item.registered || item.created || "N/A"}</p>
                             </div>
 
                             {/* Phone */}
                             <div>
-                                <p className="text-sm text-gray-500 mb-1">Phone Parent</p>
-                                <p className="font-medium text-gray-800">{item.phone}</p>
+                                <p className="text-sm text-gray-500 mb-1">Phone</p>
+                                <p className="font-medium text-gray-800">{item.phone || item.parentPhone || "N/A"}</p>
                             </div>
 
                             {/* Role */}
                             <div>
                                 <p className="text-sm text-gray-500 mb-1">Role</p>
                                 <span className="inline-block px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
-                                    {item.role}
+                                    {item.role || "Student"}
                                 </span>
                             </div>
 

@@ -22,6 +22,7 @@ import AdminGuardians from "./pages/admin/Guardians";
 import AdminDrivers from "./pages/admin/Drivers";
 import AdminSchool from "./pages/admin/School";
 import AdminBuses from "./pages/admin/Buses";
+import AdminRoute from "./pages/admin/Route";
 
 // 4. Import các trang của Parent
 import ParentDashboard from "./pages/parent/Dashboard";
@@ -93,6 +94,14 @@ function App() {
           element={
             <AdminLayout>
               <AdminBuses />
+            </AdminLayout>
+          }
+        />
+        <Route
+          path="/admin/routes"
+          element={
+            <AdminLayout>
+              <AdminRoute />
             </AdminLayout>
           }
         />

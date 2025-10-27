@@ -18,6 +18,7 @@ const Sidebar = () => {
           <ItemSidebar href="admin/drivers" title="Drivers" size="text-lg" />
           <ItemSidebar href="admin/school" title="School" size="text-lg" />
           <ItemSidebar href="admin/buses" title="Buses" size="text-lg" />
+          <ItemSidebar href="admin/routes" title="Routes" size="text-lg" />
         </nav>
       </div>
     </div>
