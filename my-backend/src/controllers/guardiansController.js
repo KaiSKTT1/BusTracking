@@ -46,7 +46,7 @@ let createGuardian = async (req, res) => {
             'SELECT id FROM users WHERE email = ?',
             [email]
         );
-        
+
         if (existing.length > 0) {
             return res.status(400).json({
                 message: 'Email already exists'

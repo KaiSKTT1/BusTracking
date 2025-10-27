@@ -46,16 +46,16 @@ const Guardians = () => {
     setLoading(true);
     try {
       const response = await api.get("/guardians");
-      console.log("📡 API Response:", response.data);
-      
-      // Backend trả về { message: 'ok', data: [...] }
-      let guardianData = Array.isArray(response.data.data) 
-        ? response.data.data 
-        : Array.isArray(response.data)
-        ? response.data
-        : [];
+      console.log(" API Response:", response.data);
 
-      console.log("👥 Guardian Data:", guardianData);
+      // Backend trả về { message: 'ok', data: [...] }
+      let guardianData = Array.isArray(response.data.data)
+        ? response.data.data
+        : Array.isArray(response.data)
+          ? response.data
+          : [];
+
+      console.log("Guardian Data:", guardianData);
 
       // Set status mặc định là "Active" vì DB không có cột status
       guardianData = guardianData.map(guardian => ({
@@ -63,10 +63,10 @@ const Guardians = () => {
         status: "Active"
       }));
 
-      console.log("✅ Final Data:", guardianData);
+      console.log("Final Data:", guardianData);
       setData(guardianData);
     } catch (error) {
-      console.error("❌ Error fetching guardians:", error);
+      console.error("Error fetching guardians:", error);
       toast.error("Failed to load guardians");
       setData([]);
     } finally {

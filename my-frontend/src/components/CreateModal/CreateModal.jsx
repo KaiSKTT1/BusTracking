@@ -117,7 +117,7 @@ const CreateModal = ({ onClose, onSave, defaultRole, requirePassword = false }) 
 
                             {/* Ẩn role đi vì nó cố định cho từng trang */}
                             <input type="hidden" name="role" value={formData.role} />
-                            
+
                             <div>
                                 <label className="text-sm text-gray-600 block mb-1">Status</label>
                                 <select
