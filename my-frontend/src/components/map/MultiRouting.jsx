@@ -17,11 +17,21 @@ const MultiRouting = ({ routes, onRoutesLoaded }) => {
         routes.forEach((route, index) => {
             // Add small delay between route calculations to avoid blocking
             setTimeout(() => {
+                // Convert waypoints array to Leaflet LatLng objects
+                const waypointsLatLng = route.waypoints?.map(wp =>
+                    L.latLng(wp.coords[0], wp.coords[1])
+                ) || [];
+
+                // Skip if no waypoints
+                if (waypointsLatLng.length < 2) {
+                    console.warn('Route has insufficient waypoints:', route.name);
+                    loadedRoutes++;
+                    setLoadedCount(loadedRoutes);
+                    return;
+                }
+
                 const routingControl = L.Routing.control({
-                    waypoints: [
-                        L.latLng(route.startCoords[0], route.startCoords[1]),
-                        L.latLng(route.endCoords[0], route.endCoords[1]),
-                    ],
+                    waypoints: waypointsLatLng,
                     lineOptions: {
                         styles: [{
                             color: route.color,

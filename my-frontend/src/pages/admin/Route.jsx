@@ -2,12 +2,13 @@ import { useState } from "react";
 import TitlePage from "../../components/title_pages/TitlePage";
 import { ICONS } from "../../config/ICONS";
 import Button from "../../components/button/Button";
+import ItemRoute from "../../components/ItemRoute/ItemRoute";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import MultiRouting from "../../components/map/MultiRouting";
 import { FaLayerGroup } from "react-icons/fa";
 
 const Route = () => {
-    const BusIcon = ICONS.Buses;
+    const RoutesIcon = ICONS.Routes;
     const PlusIcon = ICONS.plus;
 
     // Mảng màu sắc cho các tuyến
@@ -20,59 +21,70 @@ const Route = () => {
         "#EC4899", // Pink
     ];
 
-    // Mock data cho các tuyến đường
+    // Mock data cho các tuyến đường với nhiều điểm dừng
     const [routes] = useState([
         {
             id: 1,
             name: "Tuyến 1: Bình Tân - Quận 1",
             busNumber: "BUS-001",
-            startPoint: "173 An Dương Vương, Bình Tân",
-            endPoint: "Bến Thành, Quận 1",
-            startCoords: [10.737, 106.62],
-            endCoords: [10.7724, 106.6988],
             status: "active",
             distance: "12.5 km",
-            students: 25,
+            totalStudents: 25,
             color: routeColors[0],
+            waypoints: [
+                { name: "173 An Dương Vương, Bình Tân", coords: [10.737, 106.62], students: 5 },
+                { name: "Chợ Bình Tân", coords: [10.745, 106.63], students: 4 },
+                { name: "Aeon Mall Tân Phú", coords: [10.752, 106.645], students: 6 },
+                { name: "Đầm Sen", coords: [10.7654, 106.6591], students: 5 },
+                { name: "Bến Thành, Quận 1", coords: [10.7724, 106.6988], students: 5 },
+            ],
         },
         {
             id: 2,
             name: "Tuyến 2: Thủ Đức - Quận 3",
             busNumber: "BUS-002",
-            startPoint: "Linh Trung, Thủ Đức",
-            endPoint: "Võ Văn Tần, Quận 3",
-            startCoords: [10.8705, 106.8005],
-            endCoords: [10.7836, 106.6908],
             status: "active",
             distance: "15.2 km",
-            students: 30,
+            totalStudents: 30,
             color: routeColors[1],
+            waypoints: [
+                { name: "Linh Trung, Thủ Đức", coords: [10.8705, 106.8005], students: 8 },
+                { name: "Khu Công Nghệ Cao", coords: [10.8512, 106.7698], students: 7 },
+                { name: "Giga Mall", coords: [10.8326, 106.7544], students: 6 },
+                { name: "Landmark 81", coords: [10.7953, 106.7218], students: 4 },
+                { name: "Võ Văn Tần, Quận 3", coords: [10.7836, 106.6908], students: 5 },
+            ],
         },
         {
             id: 3,
             name: "Tuyến 3: Tân Bình - Quận 5",
             busNumber: "BUS-003",
-            startPoint: "Tân Sơn Nhất, Tân Bình",
-            endPoint: "Chợ Lớn, Quận 5",
-            startCoords: [10.8184, 106.6574],
-            endCoords: [10.7554, 106.6784],
             status: "inactive",
             distance: "8.3 km",
-            students: 18,
+            totalStudents: 18,
             color: routeColors[2],
+            waypoints: [
+                { name: "Sân bay Tân Sơn Nhất", coords: [10.8184, 106.6574], students: 5 },
+                { name: "Hoàng Văn Thụ", coords: [10.7989, 106.6652], students: 4 },
+                { name: "Lý Thái Tổ, Quận 10", coords: [10.7774, 106.6695], students: 4 },
+                { name: "Chợ Lớn, Quận 5", coords: [10.7554, 106.6784], students: 5 },
+            ],
         },
         {
             id: 4,
             name: "Tuyến 4: Bình Thạnh - Quận 7",
             busNumber: "BUS-004",
-            startPoint: "Nguyễn Xí, Bình Thạnh",
-            endPoint: "Phú Mỹ Hưng, Quận 7",
-            startCoords: [10.8142, 106.7072],
-            endCoords: [10.7285, 106.7198],
             status: "active",
             distance: "11.8 km",
-            students: 22,
+            totalStudents: 22,
             color: routeColors[3],
+            waypoints: [
+                { name: "Nguyễn Xí, Bình Thạnh", coords: [10.8142, 106.7072], students: 6 },
+                { name: "Cầu Sài Gòn", coords: [10.7896, 106.7112], students: 5 },
+                { name: "Võ Văn Kiệt, Quận 1", coords: [10.7658, 106.7054], students: 5 },
+                { name: "Cầu Phú Mỹ", coords: [10.7436, 106.7156], students: 3 },
+                { name: "Phú Mỹ Hưng, Quận 7", coords: [10.7285, 106.7198], students: 3 },
+            ],
         },
     ]);
 
@@ -104,8 +116,8 @@ const Route = () => {
             <div className="p-6">
                 <div className="flex items-center justify-between mb-6">
                     <TitlePage
-                        title="Bus Routes"
-                        icon={<BusIcon className="text-orange-700" size={30} />}
+                        title="Routes"
+                        icon={<RoutesIcon className="text-orange-700" size={30} />}
                         size="text-2xl"
                         color="text-gray-700"
                     />
@@ -124,11 +136,10 @@ const Route = () => {
                             </h2>
                             <button
                                 onClick={handleShowAllRoutes}
-                                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${showAllRoutes
-                                    ? "bg-blue-500 text-white shadow-md"
-                                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${showAllRoutes
+                                        ? "bg-blue-500 text-white shadow-md hover:bg-blue-600"
+                                        : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                                     }`}
-                                title="Show all routes"
                             >
                                 <FaLayerGroup size={14} />
                                 All
@@ -136,59 +147,12 @@ const Route = () => {
                         </div>
 
                         {routes.map((route) => (
-                            <div
+                            <ItemRoute
                                 key={route.id}
+                                route={route}
+                                isSelected={!showAllRoutes && selectedRoute?.id === route.id}
                                 onClick={() => handleRouteClick(route)}
-                                className={`p-4 border-2 rounded-lg cursor-pointer transition-all duration-200 ${!showAllRoutes && selectedRoute?.id === route.id
-                                    ? "border-orange-500 bg-orange-50 shadow-md"
-                                    : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
-                                    }`}
-                                style={{
-                                    borderLeftWidth: "6px",
-                                    borderLeftColor: route.color,
-                                }}
-                            >
-                                <div className="flex items-center justify-between mb-2">
-                                    <div className="flex items-center gap-2">
-                                        <div
-                                            className="w-4 h-4 rounded-full"
-                                            style={{ backgroundColor: route.color }}
-                                        ></div>
-                                        <h3 className="font-semibold text-gray-800">{route.name}</h3>
-                                    </div>
-                                    <span
-                                        className={`px-2 py-1 rounded-full text-xs font-medium ${route.status === "active"
-                                            ? "bg-green-100 text-green-800"
-                                            : "bg-gray-100 text-gray-600"
-                                            }`}
-                                    >
-                                        {route.status === "active" ? "Active" : "Inactive"}
-                                    </span>
-                                </div>
-
-                                <div className="space-y-1 text-sm text-gray-600">
-                                    <p>
-                                        <span className="font-medium">Bus:</span> {route.busNumber}
-                                    </p>
-                                    <p>
-                                        <span className="font-medium">From:</span>{" "}
-                                        {route.startPoint}
-                                    </p>
-                                    <p>
-                                        <span className="font-medium">To:</span> {route.endPoint}
-                                    </p>
-                                    <div className="flex justify-between pt-2 border-t border-gray-100 mt-2">
-                                        <span className="text-xs">
-                                            <span className="font-medium">Distance:</span>{" "}
-                                            {route.distance}
-                                        </span>
-                                        <span className="text-xs">
-                                            <span className="font-medium">Students:</span>{" "}
-                                            {route.students}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
+                            />
                         ))}
                     </div>
 
@@ -205,7 +169,9 @@ const Route = () => {
                                 <p className="text-sm text-gray-600 mt-1">
                                     {showAllRoutes
                                         ? `Displaying ${routes.length} routes on the map`
-                                        : `${selectedRoute?.startPoint} → ${selectedRoute?.endPoint}`}
+                                        : selectedRoute?.waypoints
+                                            ? `${selectedRoute.waypoints[0]?.name} → ${selectedRoute.waypoints[selectedRoute.waypoints.length - 1]?.name}`
+                                            : "No waypoints"}
                                 </p>
 
                                 {/* Legend */}
@@ -245,7 +211,7 @@ const Route = () => {
                                     center={
                                         showAllRoutes
                                             ? [10.7769, 106.7009]
-                                            : selectedRoute?.startCoords || [10.7769, 106.7009]
+                                            : selectedRoute?.waypoints?.[0]?.coords || [10.7769, 106.7009]
                                     }
                                     zoom={showAllRoutes ? 11 : 12}
                                     style={{ height: "100%", width: "100%" }}
@@ -255,36 +221,41 @@ const Route = () => {
                                         attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
                                     />
 
-                                    {/* Markers for displayed routes */}
+                                    {/* Markers for all waypoints */}
                                     {displayedRoutes.map((route) => (
                                         <div key={route.id}>
-                                            {/* Start Point Marker */}
-                                            <Marker position={route.startCoords}>
-                                                <Popup>
-                                                    <div className="text-sm">
-                                                        <p className="font-semibold" style={{ color: route.color }}>
-                                                            {route.name}
-                                                        </p>
-                                                        <p className="text-green-600 font-medium">Điểm bắt đầu</p>
-                                                        <p>{route.startPoint}</p>
-                                                        <p className="text-xs text-gray-500 mt-1">Bus: {route.busNumber}</p>
-                                                    </div>
-                                                </Popup>
-                                            </Marker>
-
-                                            {/* End Point Marker */}
-                                            <Marker position={route.endCoords}>
-                                                <Popup>
-                                                    <div className="text-sm">
-                                                        <p className="font-semibold" style={{ color: route.color }}>
-                                                            {route.name}
-                                                        </p>
-                                                        <p className="text-red-600 font-medium">Điểm kết thúc</p>
-                                                        <p>{route.endPoint}</p>
-                                                        <p className="text-xs text-gray-500 mt-1">Bus: {route.busNumber}</p>
-                                                    </div>
-                                                </Popup>
-                                            </Marker>
+                                            {route.waypoints?.map((waypoint, index) => (
+                                                <Marker key={`${route.id}-${index}`} position={waypoint.coords}>
+                                                    <Popup>
+                                                        <div className="text-sm">
+                                                            <p className="font-semibold" style={{ color: route.color }}>
+                                                                {route.name}
+                                                            </p>
+                                                            <p
+                                                                className={`font-medium ${index === 0
+                                                                        ? "text-green-600"
+                                                                        : index === route.waypoints.length - 1
+                                                                            ? "text-red-600"
+                                                                            : "text-blue-600"
+                                                                    }`}
+                                                            >
+                                                                {index === 0
+                                                                    ? "Điểm bắt đầu"
+                                                                    : index === route.waypoints.length - 1
+                                                                        ? "Điểm kết thúc"
+                                                                        : `Điểm dừng ${index}`}
+                                                            </p>
+                                                            <p>{waypoint.name}</p>
+                                                            {waypoint.students > 0 && (
+                                                                <p className="text-xs text-gray-500 mt-1">
+                                                                    Students: {waypoint.students}
+                                                                </p>
+                                                            )}
+                                                            <p className="text-xs text-gray-500">Bus: {route.busNumber}</p>
+                                                        </div>
+                                                    </Popup>
+                                                </Marker>
+                                            ))}
                                         </div>
                                     ))}
 
