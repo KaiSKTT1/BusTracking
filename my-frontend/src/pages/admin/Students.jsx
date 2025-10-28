@@ -8,91 +8,74 @@ import { STUDENT_TABS } from "../../config/STUDENT_TABS";
 import { ICONS } from "../../config/ICONS";
 import Header from "../../components/header/Header";
 import TitlePage from "../../components/title_pages/TitlePage";
-import DetailModal from "../../components/DetailModal/DetailModal";
-import EditModal from "../../components/EditModal/EditModal";
-import api from "../../utils/axios";
-import ButtonsAction from "../../components/buttonsAction/ButtonsAction";
 
 const Students = () => {
-    const AddressCardIcon = ICONS.Students;
 
+    //icons
+    const AddressCardIcon = ICONS.Students;
 
     const [activeTab, setActiveTab] = useState("active");
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState("");
+
+    //State cho pagination
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(10);
 
-    // ===== SỬA LẠI - Dùng modalType thay vì showModal =====
-    const [modalType, setModalType] = useState(null); // null | 'view' | 'edit' | 'delete'
-    const [selectedStudent, setSelectedStudent] = useState(null);
-    // ====================================================
-
     useEffect(() => {
-        fetchStudents();
+        fetchDrivers();
     }, [activeTab]);
 
-    const fetchStudents = async () => {
+    const fetchDrivers = async () => {
         setLoading(true);
         try {
-            const res = await api.get("/students");
-            console.log(res);
-            setData(res.data || []);
+            // Tạm thời comment API call
+            // const response = await fetch(`/api/students?status=${activeTab}`);
+            // const result = await response.json();
+
+            // Mock data để test
+            const mockData = {
+                active: [
+                    { student_id: 1, name: "Nguyen Van A", school_id: "1", note: "Lớp 1A", id_ph: "1", status: "Active", created: "2024-01-01" },
+                    { student_id: 2, name: "Tran Thi B", school_id: "2", note: "Lớp 3C", id_ph: "2", status: "Active", created: "2024-01-02" },
+                    { student_id: 3, name: "Vo Thi C ", school_id: "1", note: "Lớp 2E", id_ph: "3", status: "Active", created: "2024-01-01" },
+                    { student_id: 4, name: "Le Minh D", school_id: "3", note: "Lớp 5G", id_ph: "1", status: "Active", created: "2024-01-02" },
+                ],
+                suspended: [
+                    { student_id: 3, name: "Vo Thi C ", school_id: "1", note: "Lớp 2E", id_ph: "3", status: "Active", created: "2024-01-01" },
+                ],
+                under_review: [
+                    { student_id: 4, name: "Le Minh D", school_id: "3", note: "Lớp 5G", id_ph: "1", status: "Active", created: "2024-01-02" },
+                ],
+                out_of_coins: [
+                      { student_id: 4, name: "Le Minh D", school_id: "3", note: "Lớp 5G", id_ph: "1", status: "Active", created: "2024-01-02" },
+                ]
+            };
+
+            setData(mockData[activeTab] || []);
         } catch (error) {
-            console.error("Error fetching students:", error);
-            setData([]);
+            console.error("Error fetching drivers:", error);
+            setData([]); // Set empty array nếu có lỗi
         } finally {
             setLoading(false);
         }
     };
 
-    // ===== Các hàm xử lý modal =====
-    const handleViewStudent = (student) => {
-        setSelectedStudent(student);
-        setModalType('view');  // Mở modal VIEW
-    };
-
-    const handleEditStudent = (student) => {
-        setSelectedStudent(student);
-        setModalType('edit');  // Mở modal EDIT
-    };
-
-    const handleDeleteStudent = (student) => {
-        setSelectedStudent(student);
-        setModalType('delete');  // Mở modal DELETE
-    };
-
-    const handleCloseModal = () => {
-        setModalType(null);
-        setSelectedStudent(null);
-    };
-
-    const handleSaveEdit = (updatedData) => {
-        console.log("Saving updated data:", updatedData);
-        // TODO: Call API để update
-        // fetch(`/api/students/${selectedStudent.id}`, {
-        //     method: 'PUT',
-        //     body: JSON.stringify(updatedData)
-        // })
-
-        handleCloseModal();
-    };
-    // ================================
-
+    // Lọc dữ liệu
     const filteredData = data.filter((student) =>
         Object.values(student).some((val) =>
             String(val).toLowerCase().includes(searchQuery.toLowerCase())
         )
     );
 
+    // Pagination logic
     const totalPages = Math.ceil(filteredData.length / rowsPerPage);
     const startIndex = (currentPage - 1) * rowsPerPage;
     const endIndex = startIndex + rowsPerPage;
     const paginatedData = filteredData.slice(startIndex, endIndex);
 
-    const handlePrevious = () => {
-        setCurrentPage((prev) => Math.max(prev - 1, 1));
+    const handlePrevious = () => {setCurrentPage((prev) => Math.max(prev - 1, 1));
     };
 
     const handleNext = () => {
@@ -101,7 +84,7 @@ const Students = () => {
 
     const handleRowsPerPageChange = (newRowsPerPage) => {
         setRowsPerPage(newRowsPerPage);
-        setCurrentPage(1);
+        setCurrentPage(1); // Reset về trang 1
     };
 
     const renderCell = (student, key) => {
@@ -114,16 +97,9 @@ const Students = () => {
                 );
             case "actions":
                 return (
-                    <div className="flex items-center gap-2">
-
-                        <ButtonsAction
-                            onView={handleViewStudent}
-                            onEdit={handleEditStudent}
-                            onDelete={handleDeleteStudent}
-                            item={student}
-                        />
-
-                    </div>
+                    <button className="text-blue-500 hover:text-blue-700">
+                        View
+                    </button>
                 );
             default:
                 return student[key] || "-";
@@ -141,6 +117,7 @@ const Students = () => {
                     icon={<AddressCardIcon className="text-orange-700" size={30} />}
                     size="text-2xl"
                     color="text-gray-700"
+                    className="mb-6"
                 />
 
                 <Tab tabs={STUDENT_TABS} activeTab={activeTab} onTabChange={setActiveTab} />
@@ -158,7 +135,7 @@ const Students = () => {
 
                         <Table
                             loading={loading}
-                            data={paginatedData}
+                            data={paginatedData}  //Dùng paginatedData thay vì filteredData
                             columns={currentColumns}
                             renderCell={renderCell}
                         />
@@ -175,30 +152,6 @@ const Students = () => {
                     </motion.div>
                 </AnimatePresence>
             </div>
-
-            {/* ===== RENDER MODAL DỰA TRÊN modalType ===== */}
-            <AnimatePresence>
-                {/* Modal View - Chỉ hiện khi modalType === 'view' */}
-                {modalType === 'view' && (
-                    <DetailModal
-                        item={selectedStudent}
-                        editModal={handleEditStudent}
-                        onClose={handleCloseModal}
-                    />
-                )}
-
-                {/* Modal Edit - Chỉ hiện khi modalType === 'edit' */}
-                {modalType === 'edit' && (
-                    <EditModal
-                        item={selectedStudent}
-                        onClose={handleCloseModal}
-                        onSave={handleSaveEdit}
-                    />
-                )}
-
-                {/* Modal Delete - Chỉ hiện khi modalType === 'delete' */}
-                {/* TODO: Tạo component ConfirmDeleteModal nếu cần */}
-            </AnimatePresence>
         </>
     );
 };

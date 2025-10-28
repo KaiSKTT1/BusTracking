@@ -9,3 +9,4 @@ router.put("/:id", busController.updateBus);
 router.delete("/:id", busController.deleteBus);
 
 export default router;
+

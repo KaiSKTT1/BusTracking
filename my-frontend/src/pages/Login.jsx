@@ -26,7 +26,7 @@ function Login() {
     } catch (err) {
       console.error("Lỗi đăng nhập:", err);
     //   setError("Sai tài khoản hoặc mật khẩu!");
-    navigate("/");
+    navigate("/");               // tạm thời bỏ qua login
     }
   };
 
