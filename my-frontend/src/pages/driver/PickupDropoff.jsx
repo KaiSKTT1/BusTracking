@@ -59,61 +59,64 @@ const PickupDropoff = () => {
                 <motion.div
                     initial={{ opacity: 0, y: 15 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="bg-white p-6 rounded-xl shadow-md max-w-4xl mx-auto"
+                    className="bg-white p-4 sm:p-6 rounded-xl shadow-md w-full max-w-4xl mx-auto"
                 >
-                    <table className="w-full text-sm border-collapse">
-                        <thead>
-                            <tr className="bg-gray-100 text-gray-700">
-                                <th className="border p-2">Mã học sinh</th>
-                                <th className="border p-2">Họ tên</th>
-                                <th className="border p-2">Lớp</th>
-                                <th className="border p-2">Tuyến xe</th>
-                                <th className="border p-2">Trạng thái</th>
-                                <th className="border p-2">Hành động</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {students.map((s) => (
-                                <tr key={s.id} className="text-center hover:bg-gray-50">
-                                    <td className="border p-2">{s.id}</td>
-                                    <td className="border p-2">{s.name}</td>
-                                    <td className="border p-2">{s.class}</td>
-                                    <td className="border p-2">{s.bus}</td>
-                                    <td className="border p-2">
-                                        <span
-                                            className={`px-2 py-1 rounded-full text-white text-xs ${s.currentStatus === "Chưa đón"
-                                                ? "bg-gray-500"
-                                                : s.currentStatus === "Đã đón"
-                                                    ? "bg-blue-600"
-                                                    : "bg-green-600"
-                                                }`}
-                                        >
-                                            {s.currentStatus}
-                                        </span>
-                                    </td>
-                                    <td className="border p-2">
-                                        {s.currentStatus === "Chưa đón" && (
-                                            <button
-                                                onClick={() => handleAction(s.id, "pickup")}
-                                                className="bg-blue-600 text-white px-3 py-1 rounded-lg hover:bg-blue-700 transition"
-                                            >
-                                                ✅ Đón
-                                            </button>
-                                        )}
-                                        {s.currentStatus === "Đã đón" && (
-                                            <button
-                                                onClick={() => handleAction(s.id, "drop")}
-                                                className="bg-yellow-500 text-white px-3 py-1 rounded-lg hover:bg-yellow-600 transition"
-                                            >
-                                                🚗 Trả
-                                            </button>
-                                        )}
-                                    </td>
+                    <div className="overflow-x-auto">
+                        <table className="min-w-full text-sm border-collapse">
+                            <thead>
+                                <tr className="bg-gray-100 text-gray-700">
+                                    <th className="border p-2">Mã HS</th>
+                                    <th className="border p-2">Họ tên</th>
+                                    <th className="border p-2 hidden sm:table-cell">Lớp</th>
+                                    <th className="border p-2 hidden md:table-cell">Tuyến xe</th>
+                                    <th className="border p-2">Trạng thái</th>
+                                    <th className="border p-2">Hành động</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                {students.map((s) => (
+                                    <tr key={s.id} className="text-center hover:bg-gray-50">
+                                        <td className="border p-2">{s.id}</td>
+                                        <td className="border p-2">{s.name}</td>
+                                        <td className="border p-2 hidden sm:table-cell">{s.class}</td>
+                                        <td className="border p-2 hidden md:table-cell">{s.bus}</td>
+                                        <td className="border p-2">
+                                            <span
+                                                className={`px-2 py-1 rounded-full text-white text-xs ${s.currentStatus === "Chưa đón"
+                                                    ? "bg-gray-500"
+                                                    : s.currentStatus === "Đã đón"
+                                                        ? "bg-blue-600"
+                                                        : "bg-green-600"
+                                                    }`}
+                                            >
+                                                {s.currentStatus}
+                                            </span>
+                                        </td>
+                                        <td className="border p-2">
+                                            {s.currentStatus === "Chưa đón" && (
+                                                <button
+                                                    onClick={() => handleAction(s.id, "pickup")}
+                                                    className="bg-blue-600 text-white px-2 sm:px-3 py-1 rounded-lg text-xs sm:text-sm hover:bg-blue-700 transition"
+                                                >
+                                                    ✅ Đón
+                                                </button>
+                                            )}
+                                            {s.currentStatus === "Đã đón" && (
+                                                <button
+                                                    onClick={() => handleAction(s.id, "drop")}
+                                                    className="bg-yellow-500 text-white px-2 sm:px-3 py-1 rounded-lg text-xs sm:text-sm hover:bg-yellow-600 transition"
+                                                >
+                                                    🚗 Trả
+                                                </button>
+                                            )}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 </motion.div>
+
 
                 {/* Lịch sử đón / trả */}
                 {history.length > 0 && (

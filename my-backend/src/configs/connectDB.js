@@ -5,14 +5,14 @@ import mysql from 'mysql2/promise';
 console.log("Creating connection pool...");
 
 const pool = mysql.createPool({
-    // host: 'localhost',
-    // user: 'root',
-    // database: 'buscontrol',
-    // password: 'password'
     host: 'localhost',
-    user: 'hbstudent',
-    database: 'buscontrol',
-    password: 'hbstudent'
+    user: 'root',
+    database: 'bus_tracking',
+    //password: 'password'
+    // host: 'localhost',
+    // user: 'hbstudent',
+    // database: 'bus_tracking',
+    // password: 'hbstudent'
 })
 
 

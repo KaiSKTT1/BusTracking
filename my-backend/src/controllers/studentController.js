@@ -1,67 +1,40 @@
-import pool from "../configs/connectDB.js";
+import studentModel from "../models/studentModel.js";
 
-let getAllStudents = async (req, res) => {
+// GET all students
+const getAllStudents = async (req, res) => {
     try {
-        const query = `
-            SELECT 
-                s.id,
-                s.name,
-                s.address,
-                s.parent_id,
-                u.name as parent_name,
-                u.phone as parent_phone,
-                u.email as parent_email
-            FROM students s
-            LEFT JOIN users u ON s.parent_id = u.id
-            ORDER BY s.id DESC
-        `;
-        const [rows] = await pool.execute(query);
-        return res.status(200).json(rows);
+        const [rows] = await studentModel.getAllStudentsModel();
+        return res.status(200).json({ message: "ok", data: rows });
     } catch (err) {
         console.error("Error fetching students:", err);
         return res.status(500).json({ message: err.message });
     }
 };
 
-let getStudentById = async (req, res) => {
-    let { id } = req.params;
+// GET student by ID
+const getStudentById = async (req, res) => {
+    const { id } = req.params;
     try {
-        const query = `
-            SELECT 
-                s.id,
-                s.name,
-                s.address,
-                s.parent_id,
-                u.name as parent_name,
-                u.phone as parent_phone,
-                u.email as parent_email
-            FROM students s
-            LEFT JOIN users u ON s.parent_id = u.id
-            WHERE s.id = ?
-        `;
-        const [rows] = await pool.execute(query, [id]);
-        if (rows.length === 0) {
+        const [rows] = await studentModel.getStudentByIdModel(id);
+        if (rows.length === 0)
             return res.status(404).json({ message: "Student not found" });
-        }
-        return res.status(200).json(rows[0]);
+
+        return res.status(200).json({ message: "ok", data: rows[0] });
     } catch (err) {
         console.error("Error fetching student:", err);
         return res.status(500).json({ message: err.message });
     }
 };
 
-let createStudent = async (req, res) => {
-    let { name, address, parent_id } = req.body;
+// CREATE student
+const createStudent = async (req, res) => {
+    const { name, address, parent_id } = req.body;
 
-    if (!name) {
+    if (!name)
         return res.status(400).json({ message: "Missing required field: name" });
-    }
 
     try {
-        await pool.execute(
-            `INSERT INTO students (name, address, parent_id) VALUES (?, ?, ?)`,
-            [name, address || null, parent_id || null]
-        );
+        await studentModel.insertStudentModel(name, address, parent_id);
         return res.status(201).json({ message: "Student created successfully" });
     } catch (err) {
         console.error("Error creating student:", err);
@@ -69,19 +42,16 @@ let createStudent = async (req, res) => {
     }
 };
 
-let updateStudent = async (req, res) => {
-    let { id } = req.params;
-    let { name, address, parent_id } = req.body;
+// UPDATE student
+const updateStudent = async (req, res) => {
+    const { id } = req.params;
+    const { name, address, parent_id } = req.body;
 
-    if (!id || !name) {
+    if (!id || !name)
         return res.status(400).json({ message: "Missing required params" });
-    }
 
     try {
-        await pool.execute(
-            `UPDATE students SET name = ?, address = ?, parent_id = ? WHERE id = ?`,
-            [name, address || null, parent_id || null, id]
-        );
+        await studentModel.updateStudentModel(id, name, address, parent_id);
         return res.status(200).json({ message: "Student updated successfully" });
     } catch (err) {
         console.error("Error updating student:", err);
@@ -89,10 +59,11 @@ let updateStudent = async (req, res) => {
     }
 };
 
-let deleteStudent = async (req, res) => {
-    let { id } = req.params;
+// DELETE student
+const deleteStudent = async (req, res) => {
+    const { id } = req.params;
     try {
-        await pool.execute("DELETE FROM students WHERE id = ?", [id]);
+        await studentModel.deleteStudentModel(id);
         return res.status(200).json({ message: "Student deleted successfully" });
     } catch (err) {
         console.error("Error deleting student:", err);
@@ -105,5 +76,5 @@ export default {
     getStudentById,
     createStudent,
     updateStudent,
-    deleteStudent,
+    deleteStudent
 };

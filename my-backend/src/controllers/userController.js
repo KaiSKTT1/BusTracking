@@ -1,71 +1,59 @@
-import pool from '../configs/connectDB.js';
-let getAllUsers = async (req, res) => {
+import userModel from "../models/userModel.js";
+
+// GET all users
+const getAllUsers = async (req, res) => {
     try {
-        const [rows] = await pool.execute('SELECT * FROM Users');
-        return res.status(200).json({ message: 'ok', data: rows });
+        const [rows] = await userModel.getAllUsersModel();
+        return res.status(200).json({ message: "ok", data: rows });
     } catch (err) {
         return res.status(500).json({ message: err.message });
     }
 };
 
-let createNewUser = async (req, res) => {
-    let { name, phone, email, password, role } = req.body;
+// CREATE new user
+const createNewUser = async (req, res) => {
+    const { name, phone, email, password, role } = req.body;
 
     if (!name || !email || !password || !role) {
-        return res.status(400).json({
-            message: 'missing required params'
-        });
+        return res.status(400).json({ message: "Missing required params" });
     }
 
     try {
-        await pool.execute(
-            `INSERT INTO Users (name, phone, email, password, role) 
-             VALUES (?, ?, ?, ?, ?)`,
-            [name, phone || null, email, password, role]
-        );
-
-        return res.status(201).json({ message: 'user created' });
+        await userModel.insertUserModel(name, phone, email, password, role);
+        return res.status(201).json({ message: "User created successfully" });
     } catch (err) {
         return res.status(500).json({ message: err.message });
     }
-
 };
-let updateUser = async (req, res) => {
-    let { id } = req.params;
-    let { name, phone, email, password, role } = req.body;
+
+// UPDATE user
+const updateUser = async (req, res) => {
+    const { id } = req.params;
+    const { name, phone, email, password, role } = req.body;
 
     if (!id || !name || !email || !role) {
-        return res.status(400).json({
-            message: 'missing required params'
-        });
+        return res.status(400).json({ message: "Missing required params" });
     }
 
     try {
-        await pool.execute(
-            `UPDATE Users 
-             SET name = ?, phone = ?, email = ?, password = ?, role = ? 
-             WHERE id = ?`,
-            [name, phone || null, email, password || null, role, id]
-        );
-
-        return res.status(200).json({ message: 'user updated' });
+        await userModel.updateUserModel(id, name, phone, email, password, role);
+        return res.status(200).json({ message: "User updated successfully" });
     } catch (err) {
         return res.status(500).json({ message: err.message });
     }
 };
 
-let deleteUser = async (req, res) => {
-    let userId = req.params.id;
+// DELETE user
+const deleteUser = async (req, res) => {
+    const { id } = req.params;
 
-    if (!userId) {
-        return res.status(400).json({
-            message: 'missing required params'
-        });
+    if (!id) {
+        return res.status(400).json({ message: "Missing required params" });
     }
 
     try {
-        await pool.execute('DELETE FROM Users WHERE id = ?', [userId]);
-        return res.status(200).json({ message: 'user deleted' });
+        await userModel.deleteUserModel(id);
+        return res.status(200).json({ message: "User deleted successfully" });
     } catch (err) {
         return res.status(500).json({ message: err.message });
     }
@@ -75,5 +63,5 @@ export default {
     getAllUsers,
     createNewUser,
     updateUser,
-    deleteUser
+    deleteUser,
 };
