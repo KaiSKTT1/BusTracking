@@ -41,7 +41,15 @@ let login = async (req, res) => {
         //   maxAge: 30 * 24 * 60 * 60 * 1000,
         // });
 
-        return res.json({ accessToken });
+        return res.json({
+            accessToken,
+            user: {
+                id: user.user_id,
+                username: user.username,
+                email: user.email,
+                role_id: user.role_id,
+            },
+        });
     } catch (err) {
         console.error(err);
         return res.status(500).json({ error: "Server error" });
