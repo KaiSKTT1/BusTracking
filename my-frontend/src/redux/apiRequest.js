@@ -1,32 +1,29 @@
 import axios from "axios";
-import { loginFail, loginStart, loginSuccess } from "./authSlice";
+import { loginFail, loginStart, loginSuccess, logout } from "./authSlice";
 
 export const loginUser = async (user, dispatch, navigate) => {
     dispatch(loginStart());
     try {
         const res = await axios.post("http://localhost:8080/auth/login", user);
 
-
         if (res.data.accessToken) {
             dispatch(loginSuccess(res.data));
             localStorage.setItem("accessToken", res.data.accessToken);
 
-            // ✅ Giải mã role_id từ token hoặc từ response
             const roleId = res.data.role_id || res.data.user?.role_id;
 
-            // ✅ Điều hướng theo role_id
             switch (roleId) {
-                case 1: // admin
+                case 1:
                     navigate("/admin/dashboard");
                     break;
-                case 2: // driver
+                case 2:
                     navigate("/driver/pickupdropoff");
                     break;
-                case 3: // guardian
-                    navigate("/guardian/home");
+                case 3:
+                    navigate("/parent/dashboard");
                     break;
                 default:
-                    navigate("/"); // fallback
+                    navigate("/");
                     break;
             }
         } else {
@@ -45,4 +42,14 @@ export const loginUser = async (user, dispatch, navigate) => {
             alert("Đã xảy ra lỗi không xác định!");
         }
     }
+};
+
+// ✅ Hàm logout
+export const logoutUser = (dispatch, navigate) => {
+    // Xóa token
+    localStorage.removeItem("accessToken");
+    // Reset Redux state
+    dispatch(logout());
+    // Chuyển hướng về login
+    navigate("/");
 };

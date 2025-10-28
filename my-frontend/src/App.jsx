@@ -3,19 +3,18 @@ import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility
 import "leaflet-defaulticon-compatibility";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
-// 1. Import các Layout
+// Layouts
 import AdminLayout from "./layouts/AdminLayout";
 import ParentLayout from "./layouts/ParentLayout";
 import DriversLayout from "./layouts/DriversLayout";
 
-// 2. Import các trang chung
+// Pages
 import RoleSelect from "./pages/RoleSelect";
 import ParentLogin from "./pages/parent/Login";
 import AdminLogin from "./pages/admin/Login";
 import DriverLogin from "./pages/driver/Login";
 
-
-// 3. Import các trang của Admin
+// Admin pages
 import AdminDashboard from "./pages/admin/Dashboard";
 import AdminStudents from "./pages/admin/Students";
 import AdminGuardians from "./pages/admin/Guardians";
@@ -24,146 +23,175 @@ import AdminSchool from "./pages/admin/School";
 import AdminBuses from "./pages/admin/Buses";
 import AdminRoute from "./pages/admin/Route";
 
-// 4. Import các trang của Parent
+// Parent pages
 import ParentDashboard from "./pages/parent/Dashboard";
-import ParentBuses from "./pages/parent/TripHistory";
-import ParentStudents from "./pages/parent/Profile";
-import ParentNotifications from "./pages/parent/Notifications";
 import TripHistory from "./pages/parent/TripHistory";
 import Profile from "./pages/parent/Profile";
+import ParentNotifications from "./pages/parent/Notifications";
 
-
+// Driver pages
 import PickupDropoff from "./pages/driver/PickupDropoff";
 import ScheduleViewer from "./pages/driver/Schedules";
 import Report from "./pages/driver/Report";
-import Drivers from "./pages/admin/Drivers";
+
+// ✅ Import ProtectedRoute
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
     <Router>
       <Routes>
+        {/* Login & Role Select */}
         <Route path="/" element={<RoleSelect />} />
         <Route path="/login" element={<AdminLogin />} />
         <Route path="/parent/login" element={<ParentLogin />} />
-        <Route path="/driver/login" element={< DriverLogin />} />
+        <Route path="/driver/login" element={<DriverLogin />} />
 
-
-        {/* --- NHÓM ROUTE CỦA ADMIN (dùng AdminLayout) --- */}
+        {/* --- ADMIN ROUTES --- */}
         <Route
           path="/admin/dashboard"
           element={
-            <AdminLayout>
-              <AdminDashboard />
-            </AdminLayout>
+            <ProtectedRoute allowedRole="admin">
+              <AdminLayout>
+                <AdminDashboard />
+              </AdminLayout>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/admin/student"
           element={
-            <AdminLayout>
-              <AdminStudents />
-            </AdminLayout>
+            <ProtectedRoute allowedRole="admin">
+              <AdminLayout>
+                <AdminStudents />
+              </AdminLayout>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/admin/guardians"
           element={
-            <AdminLayout>
-              <AdminGuardians />
-            </AdminLayout>
+            <ProtectedRoute allowedRole="admin">
+              <AdminLayout>
+                <AdminGuardians />
+              </AdminLayout>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/admin/drivers"
           element={
-            <AdminLayout>
-              <AdminDrivers />
-            </AdminLayout>
+            <ProtectedRoute allowedRole="admin">
+              <AdminLayout>
+                <AdminDrivers />
+              </AdminLayout>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/admin/school"
           element={
-            <AdminLayout>
-              <AdminSchool />
-            </AdminLayout>
+            <ProtectedRoute allowedRole="admin">
+              <AdminLayout>
+                <AdminSchool />
+              </AdminLayout>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/admin/buses"
           element={
-            <AdminLayout>
-              <AdminBuses />
-            </AdminLayout>
+            <ProtectedRoute allowedRole="admin">
+              <AdminLayout>
+                <AdminBuses />
+              </AdminLayout>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/admin/routes"
           element={
-            <AdminLayout>
-              <AdminRoute />
-            </AdminLayout>
+            <ProtectedRoute allowedRole="admin">
+              <AdminLayout>
+                <AdminRoute />
+              </AdminLayout>
+            </ProtectedRoute>
           }
         />
 
-        {/* --- NHÓM ROUTE CỦA PARENT (dùng ParentLayout) --- */}
+        {/* --- PARENT ROUTES --- */}
         <Route
           path="/parent/dashboard"
           element={
-            <ParentLayout>
-              <ParentDashboard />
-            </ParentLayout>
+            <ProtectedRoute allowedRole="parent">
+              <ParentLayout>
+                <ParentDashboard />
+              </ParentLayout>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/parent/trips"
           element={
-            <ParentLayout>
-              <TripHistory />
-            </ParentLayout>
+            <ProtectedRoute allowedRole="parent">
+              <ParentLayout>
+                <TripHistory />
+              </ParentLayout>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/parent/profile"
           element={
-            <ParentLayout>
-              <Profile />
-            </ParentLayout>
+            <ProtectedRoute allowedRole="parent">
+              <ParentLayout>
+                <Profile />
+              </ParentLayout>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/parent/notifications"
           element={
-            <ParentLayout>
-              <ParentNotifications />
-            </ParentLayout>
+            <ProtectedRoute allowedRole="parent">
+              <ParentLayout>
+                <ParentNotifications />
+              </ParentLayout>
+            </ProtectedRoute>
           }
         />
 
+        {/* --- DRIVER ROUTES --- */}
         <Route
           path="/driver/pickupdropoff"
           element={
-            <DriversLayout>
-              <PickupDropoff />
-            </DriversLayout>
+            <ProtectedRoute allowedRole="driver">
+              <DriversLayout>
+                <PickupDropoff />
+              </DriversLayout>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/driver/schedules"
           element={
-            <DriversLayout>
-              <ScheduleViewer />
-            </DriversLayout>
-          }
-        /> <Route
-          path="/driver/report"
-          element={
-            <DriversLayout>
-              <Report />
-            </DriversLayout>
+            <ProtectedRoute allowedRole="driver">
+              <DriversLayout>
+                <ScheduleViewer />
+              </DriversLayout>
+            </ProtectedRoute>
           }
         />
-
+        <Route
+          path="/driver/report"
+          element={
+            <ProtectedRoute allowedRole="driver">
+              <DriversLayout>
+                <Report />
+              </DriversLayout>
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </Router>
   );

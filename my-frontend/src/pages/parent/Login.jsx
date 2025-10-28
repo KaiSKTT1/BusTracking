@@ -1,20 +1,26 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import { useDispatch } from "react-redux";
+import { loginUser } from "../../redux/apiRequest";
 export default function ParentLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const handleLogin = () => {
-    if (email === "parent@gmail.com" && password === "123456") {
-      localStorage.setItem("parentLoggedIn", "true");
-      navigate("/parent/dashboard");
-    } else {
-      alert("Sai email hoặc mật khẩu! (demo: parent@gmail.com / 123456)");
-    }
+  // const handleLogin = () => {
+  //   if (email === "parent@gmail.com" && password === "123456") {
+  //     localStorage.setItem("parentLoggedIn", "true");
+  //     navigate("/parent/dashboard");
+  //   } else {
+  //     alert("Sai email hoặc mật khẩu! (demo: parent@gmail.com / 123456)");
+  //   }
+  // };
+  const handleLogin = (e) => {
+    e.preventDefault();
+    const user = { email, password, role_id: 3 };
+    loginUser(user, dispatch, navigate);
   };
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="bg-white p-8 rounded-lg shadow-md w-96">
