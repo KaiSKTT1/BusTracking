@@ -40,9 +40,27 @@ const DeleteModal = ({ item, onClose, onConfirm }) => {
                         Are you sure you want to delete this item?
                     </p>
                     <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
-                        <p className="font-semibold text-red-900 text-lg">{item.name}</p>
-                        {item.email && (
-                            <p className="text-sm text-red-700 mt-1">{item.email}</p>
+                        {/* For Users/Drivers/Guardians */}
+                        {item.name && (
+                            <>
+                                <p className="font-semibold text-red-900 text-lg">{item.name}</p>
+                                {item.email && (
+                                    <p className="text-sm text-red-700 mt-1">{item.email}</p>
+                                )}
+                            </>
+                        )}
+
+                        {/* For Buses */}
+                        {item.license_plate && (
+                            <>
+                                <p className="text-sm text-red-600 font-medium">Bus ID: #{item.id}</p>
+                                <p className="font-semibold text-red-900 text-lg mt-1">
+                                    License Plate: {item.license_plate}
+                                </p>
+                                <p className="text-sm text-red-700 mt-1">
+                                    Seats: {item.seats} | Driver: {item.driver_name || "Unassigned"}
+                                </p>
+                            </>
                         )}
                     </div>
                     <p className="text-sm text-gray-500">
