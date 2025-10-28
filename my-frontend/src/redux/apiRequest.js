@@ -98,5 +98,55 @@ export const updateUserById = async (id, data) => {
         return null;
     }
 };
+// 🟢 1️⃣ Đón học sinh
+export const notifyPickedUp = async (driver_id, student_id, bus_id) => {
+    try {
+        const token = localStorage.getItem("accessToken");
+        const res = await axios.post(
+            `http://localhost:8080/drivers/notify/picked-up`,
+            { driver_id, student_id, bus_id },
+            { headers: { Authorization: `Bearer ${token}` } }
+        );
+        console.log("✅ notifyPickedUp:", res.data);
+        return res.data;
+    } catch (err) {
+        console.error("❌ notifyPickedUp error:", err.response?.data || err.message);
+        return null;
+    }
+};
+
+// 🟠 2️⃣ Không đón được học sinh
+export const notifyNotPickedUp = async (driver_id, student_id, bus_id, reason) => {
+    try {
+        const token = localStorage.getItem("accessToken");
+        const res = await axios.post(
+            `http://localhost:8080/drivers/notify/not-picked-up`,
+            { driver_id, student_id, bus_id, reason },
+            { headers: { Authorization: `Bearer ${token}` } }
+        );
+        console.log("✅ notifyNotPickedUp:", res.data);
+        return res.data;
+    } catch (err) {
+        console.error("❌ notifyNotPickedUp error:", err.response?.data || err.message);
+        return null;
+    }
+};
+
+// 🔴 3️⃣ Báo sự cố
+export const notifyIncident = async (driver_id, bus_id, message) => {
+    try {
+        const token = localStorage.getItem("accessToken");
+        const res = await axios.post(
+            `http://localhost:8080/drivers/notify/incident`,
+            { driver_id, bus_id, message },
+            { headers: { Authorization: `Bearer ${token}` } }
+        );
+        console.log("✅ notifyIncident:", res.data);
+        return res.data;
+    } catch (err) {
+        console.error("❌ notifyIncident error:", err.response?.data || err.message);
+        return null;
+    }
+};
 
 

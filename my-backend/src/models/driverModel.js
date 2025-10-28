@@ -113,6 +113,56 @@ const DriverModel = {
             [id]
         );
     },
+    // ✅ Gửi thông báo (ví dụ: tài xế gửi cho phụ huynh hoặc admin)
+    sendNotification: async ({
+        sender_id,
+        receiver_id = null,
+        student_id = null,
+        bus_id = null,
+        message,
+        type = "general",
+    }) => {
+        // Nếu là loại picked_up, kiểm tra có tồn tại trong ngày chưa
+        if (type === "picked_up" && student_id && sender_id) {
+            const [exist] = await pool.execute(
+                `SELECT notification_id FROM notifications 
+             WHERE sender_id = ? AND student_id = ? AND type = 'picked_up'
+             AND DATE(created_at) = CURDATE()`,
+                [sender_id, student_id]
+            );
+
+            if (exist.length > 0) {
+                console.log("⚠️ Học sinh đã được đón hôm nay, không thêm thông báo trùng.");
+                return null; // Không chèn thêm
+            }
+        }
+
+        // Nếu là loại not_picked_up, cũng kiểm tra tương tự (nếu cần)
+        if (type === "not_picked_up" && student_id && sender_id) {
+            const [exist] = await pool.execute(
+                `SELECT notification_id FROM notifications 
+             WHERE sender_id = ? AND student_id = ? AND type = 'not_picked_up'
+             AND DATE(created_at) = CURDATE()`,
+                [sender_id, student_id]
+            );
+
+            if (exist.length > 0) {
+                console.log("⚠️ Đã có thông báo không đón được học sinh này hôm nay.");
+                return null;
+            }
+        }
+
+        // Nếu chưa có, thêm mới
+        const [result] = await pool.execute(
+            `INSERT INTO notifications 
+            (sender_id, receiver_id, student_id, bus_id, message, type, status)
+         VALUES (?, ?, ?, ?, ?, ?, 'unread')`,
+            [sender_id, receiver_id, student_id, bus_id, message, type]
+        );
+
+        return result.insertId;
+    },
+
 };
 
 export default DriverModel;
