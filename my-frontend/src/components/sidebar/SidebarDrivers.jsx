@@ -16,6 +16,7 @@ const SidebarDrivers = () => {
                     <ItemSidebar href="driver/pickupdropoff" title="PickupDropoff" size="text-lg" />
                     <ItemSidebar href="driver/schedules" title="Schedules" size="text-lg" />
                     <ItemSidebar href="driver/report" title="Notify" size="text-lg" />
+                    <ItemSidebar href="driver/info" title="AccountViewer" size="text-lg" />
 
                 </nav>
             </div>

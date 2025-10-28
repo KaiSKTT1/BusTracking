@@ -44,7 +44,7 @@ let login = async (req, res) => {
         return res.json({
             accessToken,
             user: {
-                id: user.user_id,
+                user_id: user.user_id,
                 username: user.username,
                 email: user.email,
                 role_id: user.role_id,

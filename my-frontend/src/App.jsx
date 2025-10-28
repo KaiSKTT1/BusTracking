@@ -33,7 +33,7 @@ import ParentNotifications from "./pages/parent/Notifications";
 import PickupDropoff from "./pages/driver/PickupDropoff";
 import ScheduleViewer from "./pages/driver/Schedules";
 import Report from "./pages/driver/Report";
-
+import AccountViewer from "./pages/driver/AccountViewer";
 // ✅ Import ProtectedRoute
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -192,7 +192,18 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/driver/info"
+          element={
+            <ProtectedRoute allowedRole="driver">
+              <DriversLayout>
+                <AccountViewer />
+              </DriversLayout>
+            </ProtectedRoute>
+          }
+        />
       </Routes>
+
     </Router>
   );
 }
