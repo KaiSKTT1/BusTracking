@@ -267,7 +267,7 @@ const Guardians = () => {
             <DetailModal
               item={selectedGuardian}
               onClose={() => setIsDetailModalOpen(false)}
-              onEdit={() => {
+              editModal={(guardian) => {
                 setIsDetailModalOpen(false);
                 setIsEditModalOpen(true);
               }}
