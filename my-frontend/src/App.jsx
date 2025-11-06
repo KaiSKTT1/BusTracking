@@ -6,11 +6,14 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 // 1. Import các Layout
 import AdminLayout from "./layouts/AdminLayout";
 import ParentLayout from "./layouts/ParentLayout";
+import DriversLayout from "./layouts/DriversLayout";
 
 // 2. Import các trang chung
 import RoleSelect from "./pages/RoleSelect";
 import ParentLogin from "./pages/parent/Login";
 import AdminLogin from "./pages/admin/Login";
+import DriverLogin from "./pages/driver/Login";
+
 
 // 3. Import các trang của Admin
 import AdminDashboard from "./pages/admin/Dashboard";
@@ -19,6 +22,7 @@ import AdminGuardians from "./pages/admin/Guardians";
 import AdminDrivers from "./pages/admin/Drivers";
 import AdminSchool from "./pages/admin/School";
 import AdminBuses from "./pages/admin/Buses";
+import AdminRoute from "./pages/admin/Route";
 
 // 4. Import các trang của Parent
 import ParentDashboard from "./pages/parent/Dashboard";
@@ -28,6 +32,12 @@ import ParentNotifications from "./pages/parent/Notifications";
 import TripHistory from "./pages/parent/TripHistory";
 import Profile from "./pages/parent/Profile";
 
+
+import PickupDropoff from "./pages/driver/PickupDropoff";
+import ScheduleViewer from "./pages/driver/Schedules";
+import Report from "./pages/driver/Report";
+import Drivers from "./pages/admin/Drivers";
+
 function App() {
   return (
     <Router>
@@ -35,10 +45,12 @@ function App() {
         <Route path="/" element={<RoleSelect />} />
         <Route path="/login" element={<AdminLogin />} />
         <Route path="/parent/login" element={<ParentLogin />} />
+        <Route path="/driver/login" element={< DriverLogin />} />
+
 
         {/* --- NHÓM ROUTE CỦA ADMIN (dùng AdminLayout) --- */}
         <Route
-          path="/dashboard"
+          path="/admin/dashboard"
           element={
             <AdminLayout>
               <AdminDashboard />
@@ -46,7 +58,7 @@ function App() {
           }
         />
         <Route
-          path="/student"
+          path="/admin/student"
           element={
             <AdminLayout>
               <AdminStudents />
@@ -54,7 +66,7 @@ function App() {
           }
         />
         <Route
-          path="/guardians"
+          path="/admin/guardians"
           element={
             <AdminLayout>
               <AdminGuardians />
@@ -62,7 +74,7 @@ function App() {
           }
         />
         <Route
-          path="/drivers"
+          path="/admin/drivers"
           element={
             <AdminLayout>
               <AdminDrivers />
@@ -70,7 +82,7 @@ function App() {
           }
         />
         <Route
-          path="/school"
+          path="/admin/school"
           element={
             <AdminLayout>
               <AdminSchool />
@@ -78,10 +90,18 @@ function App() {
           }
         />
         <Route
-          path="/buses"
+          path="/admin/buses"
           element={
             <AdminLayout>
               <AdminBuses />
+            </AdminLayout>
+          }
+        />
+        <Route
+          path="/admin/routes"
+          element={
+            <AdminLayout>
+              <AdminRoute />
             </AdminLayout>
           }
         />
@@ -119,6 +139,31 @@ function App() {
             </ParentLayout>
           }
         />
+
+        <Route
+          path="/driver/pickupdropoff"
+          element={
+            <DriversLayout>
+              <PickupDropoff />
+            </DriversLayout>
+          }
+        />
+        <Route
+          path="/driver/schedules"
+          element={
+            <DriversLayout>
+              <ScheduleViewer />
+            </DriversLayout>
+          }
+        /> <Route
+          path="/driver/report"
+          element={
+            <DriversLayout>
+              <Report />
+            </DriversLayout>
+          }
+        />
+
       </Routes>
     </Router>
   );

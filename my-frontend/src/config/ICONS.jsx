@@ -16,6 +16,10 @@ import { FaPlus } from "react-icons/fa6";
 import { FaEye } from "react-icons/fa";
 import { FaPencil } from "react-icons/fa6";
 import { MdCancel } from "react-icons/md";
+import { FaCalendarAlt } from "react-icons/fa";
+import { FaBullhorn } from "react-icons/fa";
+import { FaShuttleVan } from "react-icons/fa";
+import { FaRoute } from "react-icons/fa";
 
 export const ICONS = {
     Dashboard: FaHouse, //Icon cho item nav Dashboard
@@ -31,10 +35,14 @@ export const ICONS = {
     Drivers: FaUserCog, //Icon cho item nav Drivers
     School: FaGraduationCap, //Icon cho item nav School
     Buses: FaBusAlt, //Icon cho item nav Buses
+    Routes: FaRoute, //Icon cho item nav Routes
     plus: FaPlus,
     eye: FaEye, //Action icon view
     pencil: FaPencil,//Action icon edit
     cancel: MdCancel,//Action icon delete
     bell: FaBell,
+    Schedules: FaCalendarAlt,
+    Notify: FaBullhorn,
+    PickupDropoff: FaShuttleVan,
 
 };

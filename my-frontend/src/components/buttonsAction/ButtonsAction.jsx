@@ -8,7 +8,7 @@ const ButtonsAction = ({ onView, onEdit, onDelete, item }) => {
     const ActionDelete = ICONS.cancel;
 
     return (
-        <>
+        <div className="flex items-center gap-3">
             <ActionView
                 className="text-blue-600 cursor-pointer hover:text-blue-800 transition-colors"
                 size={18}
@@ -31,7 +31,7 @@ const ButtonsAction = ({ onView, onEdit, onDelete, item }) => {
                 onClick={() => onDelete(item)}
                 title="Xóa"
             />
-        </>
+        </div>
     );
 
 };

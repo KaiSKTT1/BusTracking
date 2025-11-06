@@ -8,10 +8,11 @@ export const DRIVER_TABS = {
             { key: 'id', label: 'ID', width: '80px' },
             { key: 'name', label: 'Name', width: '200px' },
             { key: 'email', label: 'Email', width: '250px' },
-            { key: 'bus', label: 'Bus', width: '150px' },
+            { key: 'phone', label: 'Phone', width: '150px' },
+            { key: 'role', label: 'Role', width: '120px' },
             { key: 'status', label: 'Status', width: '120px' },
-            { key: 'created', label: 'Created', width: '150px' },
-            { key: 'actions', label: 'Actions', width: '120px' }
+            { key: 'created_at', label: 'Created', width: '150px' },
+            { key: 'actions', label: 'Actions', width: '150px' }
         ]
     },
     suspended: {
@@ -21,10 +22,11 @@ export const DRIVER_TABS = {
             { key: 'id', label: 'ID', width: '80px' },
             { key: 'name', label: 'Name', width: '200px' },
             { key: 'email', label: 'Email', width: '250px' },
-            { key: 'bus', label: 'Bus', width: '150px' },
+            { key: 'phone', label: 'Phone', width: '150px' },
+            { key: 'role', label: 'Role', width: '120px' },
             { key: 'status', label: 'Status', width: '120px' },
-            { key: 'created', label: 'Created', width: '150px' },
-            { key: 'actions', label: 'Actions', width: '120px' }
+            { key: 'created_at', label: 'Created', width: '150px' },
+            { key: 'actions', label: 'Actions', width: '150px' }
         ]
     },
     under_review: {
@@ -34,11 +36,11 @@ export const DRIVER_TABS = {
             { key: 'id', label: 'ID', width: '80px' },
             { key: 'name', label: 'Name', width: '200px' },
             { key: 'email', label: 'Email', width: '250px' },
-            { key: 'bus', label: 'Bus', width: '150px' },
+            { key: 'phone', label: 'Phone', width: '150px' },
+            { key: 'role', label: 'Role', width: '120px' },
             { key: 'status', label: 'Status', width: '120px' },
-            { key: 'created', label: 'Created', width: '150px' },
-            { key: 'actions', label: 'Actions', width: '120px' }
+            { key: 'created_at', label: 'Created', width: '150px' },
+            { key: 'actions', label: 'Actions', width: '150px' }
         ]
     },
-
 };
