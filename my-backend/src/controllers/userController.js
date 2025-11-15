@@ -1,7 +1,19 @@
 import pool from '../configs/connectDB.js';
+
 let getAllUsers = async (req, res) => {
     try {
-        const [rows] = await pool.execute('SELECT * FROM Users');
+        // Sửa: JOIN user_account với role, đổi tên cột
+        const query = `
+            SELECT 
+                ua.user_id as id, 
+                ua.username as name, 
+                ua.email, 
+                ua.status,
+                r.name_role as role
+            FROM user_account ua
+            LEFT JOIN role r ON ua.role_id = r.role_id
+        `;
+        const [rows] = await pool.execute(query);
         return res.status(200).json({ message: 'ok', data: rows });
     } catch (err) {
         return res.status(500).json({ message: err.message });
@@ -9,43 +21,47 @@ let getAllUsers = async (req, res) => {
 };
 
 let createNewUser = async (req, res) => {
-    let { name, phone, email, password, role } = req.body;
+    // Sửa: đổi 'name' thành 'username', 'role' thành 'role_id'. Bỏ 'phone'
+    let { username, email, password, role_id } = req.body;
 
-    if (!name || !email || !password || !role) {
+    if (!username || !email || !password || !role_id) {
         return res.status(400).json({
-            message: 'missing required params'
+            message: 'missing required params (username, email, password, role_id)'
         });
     }
 
     try {
+        // Sửa: INSERT vào user_account
         await pool.execute(
-            `INSERT INTO Users (name, phone, email, password, role) 
-             VALUES (?, ?, ?, ?, ?)`,
-            [name, phone || null, email, password, role]
+            `INSERT INTO user_account (username, email, password, role_id, status) 
+             VALUES (?, ?, ?, ?, 'active')`, // Giả sử status mặc định là 'active'
+            [username, email, password, role_id]
         );
 
         return res.status(201).json({ message: 'user created' });
     } catch (err) {
         return res.status(500).json({ message: err.message });
     }
-
 };
+
 let updateUser = async (req, res) => {
     let { id } = req.params;
-    let { name, phone, email, password, role } = req.body;
+    // Sửa: đổi 'name' thành 'username', 'role' thành 'role_id'. Bỏ 'phone'
+    let { username, email, password, role_id, status } = req.body;
 
-    if (!id || !name || !email || !role) {
+    if (!id || !username || !email || !role_id || !status) {
         return res.status(400).json({
-            message: 'missing required params'
+            message: 'missing required params (id, username, email, role_id, status)'
         });
     }
 
     try {
+        // Sửa: UPDATE user_account
         await pool.execute(
-            `UPDATE Users 
-             SET name = ?, phone = ?, email = ?, password = ?, role = ? 
-             WHERE id = ?`,
-            [name, phone || null, email, password || null, role, id]
+            `UPDATE user_account 
+             SET username = ?, email = ?, password = ?, role_id = ?, status = ?
+             WHERE user_id = ?`,
+            [username, email, password || null, role_id, status, id]
         );
 
         return res.status(200).json({ message: 'user updated' });
@@ -64,7 +80,8 @@ let deleteUser = async (req, res) => {
     }
 
     try {
-        await pool.execute('DELETE FROM Users WHERE id = ?', [userId]);
+        // Sửa: DELETE từ user_account bằng user_id
+        await pool.execute('DELETE FROM user_account WHERE user_id = ?', [userId]);
         return res.status(200).json({ message: 'user deleted' });
     } catch (err) {
         return res.status(500).json({ message: err.message });

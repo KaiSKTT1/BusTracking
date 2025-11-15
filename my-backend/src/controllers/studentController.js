@@ -2,21 +2,22 @@ import pool from "../configs/connectDB.js";
 
 let getAllStudents = async (req, res) => {
     try {
+        // Sửa: Tên bảng, tên cột và JOIN
         const query = `
             SELECT 
-                s.id,
+                s.student_id as id,
                 s.name,
-                s.address,
-                s.parent_id,
-                u.name as parent_name,
-                u.phone as parent_phone,
+                s.school_id,
+                s.note,
+                s.id_ph as parent_id,
+                u.username as parent_name,
                 u.email as parent_email
-            FROM students s
-            LEFT JOIN users u ON s.parent_id = u.id
-            ORDER BY s.id DESC
+            FROM student s
+            LEFT JOIN user_account u ON s.id_ph = u.user_id
+            ORDER BY s.student_id DESC
         `;
         const [rows] = await pool.execute(query);
-        return res.status(200).json(rows);
+        return res.status(200).json(rows); // Sửa: Chỉ trả về rows theo code cũ
     } catch (err) {
         console.error("Error fetching students:", err);
         return res.status(500).json({ message: err.message });
@@ -26,18 +27,19 @@ let getAllStudents = async (req, res) => {
 let getStudentById = async (req, res) => {
     let { id } = req.params;
     try {
+        // Sửa: Tên bảng, tên cột và JOIN
         const query = `
             SELECT 
-                s.id,
+                s.student_id as id,
                 s.name,
-                s.address,
-                s.parent_id,
-                u.name as parent_name,
-                u.phone as parent_phone,
+                s.school_id,
+                s.note,
+                s.id_ph as parent_id,
+                u.username as parent_name,
                 u.email as parent_email
-            FROM students s
-            LEFT JOIN users u ON s.parent_id = u.id
-            WHERE s.id = ?
+            FROM student s
+            LEFT JOIN user_account u ON s.id_ph = u.user_id
+            WHERE s.student_id = ?
         `;
         const [rows] = await pool.execute(query, [id]);
         if (rows.length === 0) {
@@ -51,16 +53,19 @@ let getStudentById = async (req, res) => {
 };
 
 let createStudent = async (req, res) => {
-    let { name, address, parent_id } = req.body;
+    // Sửa: Bỏ 'address', thay bằng 'note'. 'parent_id' -> 'id_ph'
+    let { name, note, id_ph } = req.body;
 
     if (!name) {
         return res.status(400).json({ message: "Missing required field: name" });
     }
 
     try {
+        // Sửa: Tên bảng và cột
         await pool.execute(
-            `INSERT INTO students (name, address, parent_id) VALUES (?, ?, ?)`,
-            [name, address || null, parent_id || null]
+            `INSERT INTO student (name, note, id_ph, school_id) VALUES (?, ?, ?, ?)`,
+            // Tạm thời hardcode school_id = 1, bạn nên thêm school_id vào req.body
+            [name, note || null, id_ph || null, 1] 
         );
         return res.status(201).json({ message: "Student created successfully" });
     } catch (err) {
@@ -71,16 +76,18 @@ let createStudent = async (req, res) => {
 
 let updateStudent = async (req, res) => {
     let { id } = req.params;
-    let { name, address, parent_id } = req.body;
+    // Sửa: Bỏ 'address', thay bằng 'note'. 'parent_id' -> 'id_ph'
+    let { name, note, id_ph } = req.body;
 
     if (!id || !name) {
         return res.status(400).json({ message: "Missing required params" });
     }
 
     try {
+        // Sửa: Tên bảng và cột
         await pool.execute(
-            `UPDATE students SET name = ?, address = ?, parent_id = ? WHERE id = ?`,
-            [name, address || null, parent_id || null, id]
+            `UPDATE student SET name = ?, note = ?, id_ph = ? WHERE student_id = ?`,
+            [name, note || null, id_ph || null, id]
         );
         return res.status(200).json({ message: "Student updated successfully" });
     } catch (err) {
@@ -92,7 +99,14 @@ let updateStudent = async (req, res) => {
 let deleteStudent = async (req, res) => {
     let { id } = req.params;
     try {
-        await pool.execute("DELETE FROM students WHERE id = ?", [id]);
+        // Sửa: Phải xoá ở bảng student_ride trước do có khoá ngoại
+        await pool.execute("DELETE FROM student_ride WHERE student_id = ?", [id]);
+        
+        // Sửa: Xoá ở bảng chitietbaocao trước
+        await pool.execute("DELETE FROM chitietbaocao WHERE student_id = ?", [id]);
+
+        // Sửa: Xoá student
+        await pool.execute("DELETE FROM student WHERE student_id = ?", [id]);
         return res.status(200).json({ message: "Student deleted successfully" });
     } catch (err) {
         console.error("Error deleting student:", err);

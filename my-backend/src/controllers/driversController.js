@@ -3,8 +3,16 @@ import pool from '../configs/connectDB.js';
 // GET all drivers (role = 'Driver')
 let getAllDrivers = async (req, res) => {
     try {
+        // Sửa: JOIN user_account với role, đổi tên cột
         const [rows] = await pool.execute(
-            "SELECT id, name, phone, email, role, created_at FROM users WHERE role = 'Driver'"
+            `SELECT 
+                ua.user_id as id, 
+                ua.username as name, 
+                ua.email, 
+                r.name_role as role
+             FROM user_account ua
+             JOIN role r ON ua.role_id = r.role_id
+             WHERE r.name_role = 'Driver'`
         );
         return res.status(200).json({ message: 'ok', data: rows });
     } catch (err) {
@@ -16,8 +24,16 @@ let getAllDrivers = async (req, res) => {
 let getDriverById = async (req, res) => {
     const { id } = req.params;
     try {
+        // Sửa: JOIN và dùng user_id
         const [rows] = await pool.execute(
-            "SELECT id, name, phone, email, role, created_at FROM users WHERE id = ? AND role = 'Driver'",
+            `SELECT 
+                ua.user_id as id, 
+                ua.username as name, 
+                ua.email, 
+                r.name_role as role
+             FROM user_account ua
+             JOIN role r ON ua.role_id = r.role_id
+             WHERE ua.user_id = ? AND r.name_role = 'Driver'`,
             [id]
         );
         if (rows.length === 0) {
@@ -31,32 +47,29 @@ let getDriverById = async (req, res) => {
 
 // CREATE new driver
 let createDriver = async (req, res) => {
-    const { name, phone, email, password } = req.body;
+    // Sửa: dùng 'username', bỏ 'phone'
+    const { username, email, password } = req.body;
 
-    // Validation
-    if (!name || !email || !password) {
+    if (!username || !email || !password) {
         return res.status(400).json({
-            message: 'Missing required fields: name, email, password'
+            message: 'Missing required fields: username, email, password'
         });
     }
 
     try {
-        // Check if email already exists
         const [existing] = await pool.execute(
-            'SELECT id FROM users WHERE email = ?',
+            'SELECT user_id FROM user_account WHERE email = ?',
             [email]
         );
 
         if (existing.length > 0) {
-            return res.status(400).json({
-                message: 'Email already exists'
-            });
+            return res.status(400).json({ message: 'Email already exists' });
         }
-
-        // Insert new driver with role = 'Driver'
+        
+        // Sửa: INSERT vào user_account, role_id = 2 (là Driver)
         const [result] = await pool.execute(
-            'INSERT INTO users (name, phone, email, password, role) VALUES (?, ?, ?, ?, ?)',
-            [name, phone || null, email, password, 'Driver']
+            'INSERT INTO user_account (username, email, password, role_id, status) VALUES (?, ?, ?, 2, "active")',
+            [username, email, password]
         );
 
         return res.status(201).json({
@@ -71,19 +84,18 @@ let createDriver = async (req, res) => {
 // UPDATE driver
 let updateDriver = async (req, res) => {
     const { id } = req.params;
-    const { name, phone, email, password } = req.body;
+    // Sửa: dùng 'username', bỏ 'phone'
+    const { username, email, password } = req.body;
 
-    // Validation
-    if (!name || !email) {
+    if (!username || !email) {
         return res.status(400).json({
-            message: 'Missing required fields: name, email'
+            message: 'Missing required fields: username, email'
         });
     }
 
     try {
-        // Check if driver exists and role is Driver
         const [driver] = await pool.execute(
-            "SELECT id FROM users WHERE id = ? AND role = 'Driver'",
+            "SELECT ua.user_id FROM user_account ua JOIN role r ON ua.role_id = r.role_id WHERE ua.user_id = ? AND r.name_role = 'Driver'",
             [id]
         );
 
@@ -91,34 +103,29 @@ let updateDriver = async (req, res) => {
             return res.status(404).json({ message: 'Driver not found' });
         }
 
-        // Check if new email already exists (excluding current driver)
         const [existing] = await pool.execute(
-            'SELECT id FROM users WHERE email = ? AND id != ?',
+            'SELECT user_id FROM user_account WHERE email = ? AND user_id != ?',
             [email, id]
         );
 
         if (existing.length > 0) {
-            return res.status(400).json({
-                message: 'Email already exists'
-            });
+            return res.status(400).json({ message: 'Email already exists' });
         }
 
-        // Update query - only update password if provided
+        // Sửa: Cập nhật user_account
         if (password) {
             await pool.execute(
-                'UPDATE users SET name = ?, phone = ?, email = ?, password = ? WHERE id = ?',
-                [name, phone || null, email, password, id]
+                'UPDATE user_account SET username = ?, email = ?, password = ? WHERE user_id = ?',
+                [username, email, password, id]
             );
         } else {
             await pool.execute(
-                'UPDATE users SET name = ?, phone = ?, email = ? WHERE id = ?',
-                [name, phone || null, email, id]
+                'UPDATE user_account SET username = ?, email = ? WHERE user_id = ?',
+                [username, email, id]
             );
         }
 
-        return res.status(200).json({
-            message: 'Driver updated successfully'
-        });
+        return res.status(200).json({ message: 'Driver updated successfully' });
     } catch (err) {
         return res.status(500).json({ message: err.message });
     }
@@ -129,9 +136,8 @@ let deleteDriver = async (req, res) => {
     const { id } = req.params;
 
     try {
-        // Check if driver exists and role is Driver
         const [driver] = await pool.execute(
-            "SELECT id FROM users WHERE id = ? AND role = 'Driver'",
+            "SELECT ua.user_id FROM user_account ua JOIN role r ON ua.role_id = r.role_id WHERE ua.user_id = ? AND r.name_role = 'Driver'",
             [id]
         );
 
@@ -139,24 +145,29 @@ let deleteDriver = async (req, res) => {
             return res.status(404).json({ message: 'Driver not found' });
         }
 
-        // Check if driver has assigned buses (prevent deletion)
-        const [buses] = await pool.execute(
-            'SELECT id FROM bus WHERE driver_id = ?',
-            [id]
+        // Sửa: Kiểm tra bảng 'timetable' và 'trip' thay vì 'bus'
+        const [timetables] = await pool.execute(
+            'SELECT timetable_id FROM timetable WHERE driver_id = ?', [id]
         );
-
-        if (buses.length > 0) {
+        if (timetables.length > 0) {
             return res.status(400).json({
-                message: 'Cannot delete driver with assigned buses'
+                message: 'Cannot delete driver with assigned timetables'
+            });
+        }
+        
+        const [trips] = await pool.execute(
+            'SELECT trip_id FROM trip WHERE driver_id = ?', [id]
+        );
+        if (trips.length > 0) {
+            return res.status(400).json({
+                message: 'Cannot delete driver with assigned trips'
             });
         }
 
-        // Delete driver
-        await pool.execute('DELETE FROM users WHERE id = ?', [id]);
+        // Sửa: Xoá khỏi user_account
+        await pool.execute('DELETE FROM user_account WHERE user_id = ?', [id]);
 
-        return res.status(200).json({
-            message: 'Driver deleted successfully'
-        });
+        return res.status(200).json({ message: 'Driver deleted successfully' });
     } catch (err) {
         return res.status(500).json({ message: err.message });
     }

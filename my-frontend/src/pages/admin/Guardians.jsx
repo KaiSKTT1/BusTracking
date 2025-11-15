@@ -46,24 +46,18 @@ const Guardians = () => {
     setLoading(true);
     try {
       const response = await api.get("/guardians");
-      console.log(" API Response:", response.data);
+      const raw = Array.isArray(response.data) ? response.data : (Array.isArray(response.data?.data) ? response.data.data : []);
+      console.log("Guardian Data:", raw);
 
-      // Backend trả về { message: 'ok', data: [...] }
-      let guardianData = Array.isArray(response.data.data)
-        ? response.data.data
-        : Array.isArray(response.data)
-          ? response.data
-          : [];
-
-      console.log("Guardian Data:", guardianData);
-
-      // Set status mặc định là "Active" vì DB không có cột status
-      guardianData = guardianData.map(guardian => ({
-        ...guardian,
-        status: "Active"
+      const guardianData = raw.map(g => ({
+        id: g.user_id ?? g.id,
+        name: g.username ?? g.name ?? "",
+        email: g.email ?? "N/A",
+        phone: g.phone ?? "N/A",
+        status: g.status ?? "Active",
+        created_at: g.created_at ?? g.created ?? null
       }));
 
-      console.log("Final Data:", guardianData);
       setData(guardianData);
     } catch (error) {
       console.error("Error fetching guardians:", error);
@@ -121,21 +115,11 @@ const Guardians = () => {
   const handleSaveEdit = async (updatedData) => {
     try {
       await api.put(`/guardians/${selectedGuardian.id}`, {
-        name: updatedData.name,
-        email: updatedData.email,
-        phone: updatedData.phone,
-        // Không gửi password nếu không đổi
+        username: updatedData.name,
+        email: updatedData.email
       });
 
-      toast("Guardian updated successfully!", {
-        icon: "📝",
-        style: {
-          background: "#fffbeb",
-          color: "#92400e",
-          border: "1px solid #fde68a",
-        },
-      });
-
+      toast("Guardian updated successfully!", { icon: "📝" });
       fetchGuardians();
       setIsEditModalOpen(false);
     } catch (error) {
@@ -147,10 +131,10 @@ const Guardians = () => {
   const handleCreateGuardian = async (newGuardian) => {
     try {
       await api.post("/guardians", {
-        name: newGuardian.name,
+        username: newGuardian.name,
         email: newGuardian.email,
-        phone: newGuardian.phone,
         password: newGuardian.password || "123456",
+        role_id: 3
       });
 
       toast.success("Guardian created successfully!");
@@ -165,7 +149,6 @@ const Guardians = () => {
   const confirmDelete = async () => {
     try {
       await api.delete(`/guardians/${selectedGuardian.id}`);
-
       toast.error("Guardian deleted successfully!");
       fetchGuardians();
       setIsDeleteModalOpen(false);

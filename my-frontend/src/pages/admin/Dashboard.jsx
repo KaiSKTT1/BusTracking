@@ -1,15 +1,102 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import CardCoin from "../../components/card/CardCoin";
 import StatsCard from "../../components/card/StatsCard";
 import { ICONS } from "../../config/ICONS";
+import api from "../../utils/axios";
 
 const Dashboard = () => {
-  //Icons
   const GoldIcon = ICONS.gold;
   const DollarIcon = ICONS.dollar;
   const WarningIcon = ICONS.warning;
   const AddressCardIcon = ICONS.Students;
-  const Guardians = ICONS.Guardians;
+  const GuardiansIcon = ICONS.Guardians;
+
+  const [counts, setCounts] = useState({
+    students: 0,
+    guardians: 0,
+    drivers: 0,
+    routes: 0,
+    stops: 0,
+    trips: 0,
+    buses: 0,
+  });
+
+  useEffect(() => {
+    const fetchCounts = async () => {
+      try {
+        const [
+          studentsRes,
+          usersRes,
+          routesRes,
+          stopsRes,
+          tripsRes,
+          busesRes,
+        ] = await Promise.allSettled([
+          api.get("/students"),
+          api.get("/user_account"), // filter by role on backend if available
+          api.get("/routes"),
+          api.get("/stop"),
+          api.get("/trip"),
+          api.get("/buses"),
+        ]);
+
+        const students = Array.isArray(studentsRes.value?.data)
+          ? studentsRes.value.data.length
+          : Array.isArray(studentsRes.value?.data?.data)
+          ? studentsRes.value.data.data.length
+          : 0;
+
+        // usersRes: count guardians and drivers by role_id
+        let guardians = 0;
+        let drivers = 0;
+        const usersList = Array.isArray(usersRes.value?.data)
+          ? usersRes.value.data
+          : Array.isArray(usersRes.value?.data?.data)
+          ? usersRes.value.data.data
+          : [];
+        usersList.forEach((u) => {
+          if ((u.role_id ?? u.role) === 3) guardians++;
+          if ((u.role_id ?? u.role) === 2) drivers++;
+        });
+
+        const routes = Array.isArray(routesRes.value?.data)
+          ? routesRes.value.data.length
+          : Array.isArray(routesRes.value?.data?.data)
+          ? routesRes.value.data.data.length
+          : 0;
+        const stops = Array.isArray(stopsRes.value?.data)
+          ? stopsRes.value.data.length
+          : Array.isArray(stopsRes.value?.data?.data)
+          ? stopsRes.value.data.data.length
+          : 0;
+        const trips = Array.isArray(tripsRes.value?.data)
+          ? tripsRes.value.data.length
+          : Array.isArray(tripsRes.value?.data?.data)
+          ? tripsRes.value.data.data.length
+          : 0;
+        const buses = Array.isArray(busesRes.value?.data)
+          ? busesRes.value.data.length
+          : Array.isArray(busesRes.value?.data?.data)
+          ? busesRes.value.data.data.length
+          : 0;
+
+        setCounts({
+          students,
+          guardians,
+          drivers,
+          routes,
+          stops,
+          trips,
+          buses,
+        });
+      } catch (err) {
+        console.error("Error fetching dashboard counts:", err);
+      }
+    };
+
+    fetchCounts();
+  }, []);
+
   return (
     <>
       {/* Card Coin */}
@@ -48,37 +135,37 @@ const Dashboard = () => {
         <div className="p-4 grid grid-cols-6 gap-6 my-5">
           <StatsCard
             title="Student"
-            value={0}
+            value={counts.students}
             icon={<AddressCardIcon className="text-white" size={40} />}
             bgColor="bg-blue-500"
           />
           <StatsCard
             title="Guardians"
-            value={0}
-            icon={<Guardians className="text-white" size={40} />}
+            value={counts.guardians}
+            icon={<GuardiansIcon className="text-white" size={40} />}
             bgColor="bg-orange-500"
           />
           <StatsCard
             title="Drivers"
-            value={0}
+            value={counts.drivers}
             icon={<AddressCardIcon className="text-white" size={40} />}
             bgColor="bg-green-500"
           />
           <StatsCard
             title="Routes"
-            value={0}
+            value={counts.routes}
             icon={<AddressCardIcon className="text-white" size={40} />}
             bgColor="bg-red-500"
           />
           <StatsCard
             title="Stops"
-            value={0}
+            value={counts.stops}
             icon={<AddressCardIcon className="text-white" size={40} />}
             bgColor="bg-green-500"
           />
           <StatsCard
             title="Trips"
-            value={0}
+            value={counts.trips}
             icon={<AddressCardIcon className="text-white" size={40} />}
             bgColor="bg-pink-500"
           />

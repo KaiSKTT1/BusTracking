@@ -1,21 +1,29 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import api from "../../utils/axios";
 
 export default function AdminLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogin = () => {
-    // Tài khoản demo cho Admin
-    if (email === "admin@gmail.com" && password === "admin123") {
-      // Lưu trạng thái đăng nhập vào localStorage
-      localStorage.setItem("adminLoggedIn", "true");
-      // Chuyển hướng tới dashboard của Admin
-      navigate("/admin/dashboard");
-    } else {
-      alert("Sai email hoặc mật khẩu! (demo: admin@gmail.com / admin123)");
+  const handleLogin = async () => {
+    setLoading(true);
+    try {
+      const res = await api.post("/auth/login", { email, password });
+      if (res?.data?.user && res.data.user.role_id === 1) {
+        localStorage.setItem("adminLoggedIn", "true");
+        localStorage.setItem("adminId", String(res.data.user.user_id));
+        navigate("/admin/dashboard");
+        return;
+      }
+    } catch (err) {
+      console.error("Login error:", err);
     }
+
+    alert("❌ Sai email hoặc mật khẩu!");
+    setLoading(false);
   };
 
   return (
@@ -29,20 +37,21 @@ export default function AdminLogin() {
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full border rounded-md p-2 mb-4 focus:ring-2 focus:ring-blue-500 outline-none"
+          className="w-full border rounded-md p-2 mb-4"
         />
         <input
           type="password"
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full border rounded-md p-2 mb-6 focus:ring-2 focus:ring-blue-500 outline-none"
+          className="w-full border rounded-md p-2 mb-6"
         />
         <button
           onClick={handleLogin}
-          className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition"
+          disabled={loading}
+          className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700"
         >
-          Login
+          {loading ? "Đang đăng nhập..." : "Login"}
         </button>
       </div>
     </div>
