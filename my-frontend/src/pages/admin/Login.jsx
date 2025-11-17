@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../utils/axios";
+import toast from "react-hot-toast"; // <-- 1. IMPORT TOAST
 
 export default function AdminLogin() {
   const [email, setEmail] = useState("");
@@ -12,18 +13,33 @@ export default function AdminLogin() {
     setLoading(true);
     try {
       const res = await api.post("/auth/login", { email, password });
-      if (res?.data?.user && res.data.user.role_id === 1) {
+      
+      console.log("Backend response:", res.data); // Thêm log này để kiểm tra
+
+      // SỬA 2: Kiểm tra "role" (chữ) thay vì "role_id" (số)
+      if (res?.data?.user && res.data.user.role === "Admin") {
+        // Đăng nhập thành công VÀ đúng quyền
+        toast.success("Đăng nhập thành công!");
         localStorage.setItem("adminLoggedIn", "true");
         localStorage.setItem("adminId", String(res.data.user.user_id));
         navigate("/admin/dashboard");
-        return;
+        setLoading(false); // Dừng loading
+        return; // Thoát khỏi hàm
+      } else {
+        // Đăng nhập thành công, nhưng không phải 'Admin' (ví dụ: 'Driver')
+        toast.error("Tài khoản này không có quyền Admin!");
       }
+
     } catch (err) {
+      // SỬA 3: Xử lý lỗi từ API (401 Sai mật khẩu, 403 Bị khóa, 500...)
       console.error("Login error:", err);
+      const message = err.response?.data?.message || "Email hoặc password sai!";
+      toast.error(message);
     }
 
-    alert("❌ Sai email hoặc mật khẩu!");
+    // Chỉ chạy setLoading(false) ở đây nếu đăng nhập thất bại
     setLoading(false);
+    // Xóa dòng alert("❌ Sai email hoặc mật khẩu!"); ở đây
   };
 
   return (
@@ -49,7 +65,7 @@ export default function AdminLogin() {
         <button
           onClick={handleLogin}
           disabled={loading}
-          className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700"
+          className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 disabled:opacity-50" // Thêm 'disabled:opacity-50'
         >
           {loading ? "Đang đăng nhập..." : "Login"}
         </button>

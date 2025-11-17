@@ -1,16 +1,11 @@
 import express from "express";
-import pool from "../../configs/connectDB.js";
+import userController from "../../controllers/userController.js"; // Sửa đường dẫn
 
 const router = express.Router();
 
-router.get("/", async (req, res) => {
-  try {
-    const [rows] = await pool.execute("SELECT * FROM user_account");
-    res.json(rows);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: err.message });
-  }
-});
+router.get("/", userController.getAllUsers);
+router.post("/", userController.createNewUser);
+router.put("/:id", userController.updateUser);
+router.delete("/:id", userController.deleteUser);
 
 export default router;

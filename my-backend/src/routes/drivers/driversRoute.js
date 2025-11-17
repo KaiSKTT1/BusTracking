@@ -1,16 +1,15 @@
-import express from "express";
-import pool from "../../configs/connectDB.js";
+import express from 'express';
+import driversController from '../../controllers/driversController.js';
 
 const router = express.Router();
 
-router.get("/", async (req, res) => {
-  try {
-    const [rows] = await pool.execute("SELECT * FROM drivers");
-    res.json(rows);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: err.message });
-  }
-});
+// Route này chỉ nên gọi hàm controller, không chạy SQL
+router.get('/', driversController.getAllDrivers);
+
+// Các route khác
+router.get('/:id', driversController.getDriverById);
+router.post('/', driversController.createDriver);
+router.put('/:id', driversController.updateDriver);
+router.delete('/:id', driversController.deleteDriver);
 
 export default router;

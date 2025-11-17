@@ -1,8 +1,8 @@
 import pool from '../configs/connectDB.js';
 
 let getAllUsers = async (req, res) => {
+    console.log('Fetching all users...');
     try {
-        // Sửa: JOIN user_account với role, đổi tên cột
         const query = `
             SELECT 
                 ua.user_id as id, 
@@ -16,12 +16,13 @@ let getAllUsers = async (req, res) => {
         const [rows] = await pool.execute(query);
         return res.status(200).json({ message: 'ok', data: rows });
     } catch (err) {
+        console.error('Error in getAllUsers:', err);
         return res.status(500).json({ message: err.message });
     }
 };
 
 let createNewUser = async (req, res) => {
-    // Sửa: đổi 'name' thành 'username', 'role' thành 'role_id'. Bỏ 'phone'
+    console.log('Creating new user with body:', req.body);
     let { username, email, password, role_id } = req.body;
 
     if (!username || !email || !password || !role_id) {
@@ -31,23 +32,23 @@ let createNewUser = async (req, res) => {
     }
 
     try {
-        // Sửa: INSERT vào user_account
         await pool.execute(
             `INSERT INTO user_account (username, email, password, role_id, status) 
-             VALUES (?, ?, ?, ?, 'active')`, // Giả sử status mặc định là 'active'
+             VALUES (?, ?, ?, ?, 'active')`,
             [username, email, password, role_id]
         );
 
         return res.status(201).json({ message: 'user created' });
     } catch (err) {
+        console.error('Error in createNewUser:', err);
         return res.status(500).json({ message: err.message });
     }
 };
 
 let updateUser = async (req, res) => {
     let { id } = req.params;
-    // Sửa: đổi 'name' thành 'username', 'role' thành 'role_id'. Bỏ 'phone'
     let { username, email, password, role_id, status } = req.body;
+    console.log(`Updating user ${id} with body:`, req.body);
 
     if (!id || !username || !email || !role_id || !status) {
         return res.status(400).json({
@@ -56,22 +57,29 @@ let updateUser = async (req, res) => {
     }
 
     try {
-        // Sửa: UPDATE user_account
-        await pool.execute(
+        // Sửa: Lấy kết quả [result]
+        const [result] = await pool.execute(
             `UPDATE user_account 
              SET username = ?, email = ?, password = ?, role_id = ?, status = ?
              WHERE user_id = ?`,
             [username, email, password || null, role_id, status, id]
         );
 
+        // Sửa: Kiểm tra affectedRows
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: 'User not found or data unchanged' });
+        }
+
         return res.status(200).json({ message: 'user updated' });
     } catch (err) {
+        console.error(`Error in updateUser (id: ${id}):`, err);
         return res.status(500).json({ message: err.message });
     }
 };
 
 let deleteUser = async (req, res) => {
     let userId = req.params.id;
+    console.log(`Deleting user with id: ${userId}`);
 
     if (!userId) {
         return res.status(400).json({
@@ -80,10 +88,17 @@ let deleteUser = async (req, res) => {
     }
 
     try {
-        // Sửa: DELETE từ user_account bằng user_id
-        await pool.execute('DELETE FROM user_account WHERE user_id = ?', [userId]);
+        // Sửa: Lấy kết quả [result]
+        const [result] = await pool.execute('DELETE FROM user_account WHERE user_id = ?', [userId]);
+
+        // Sửa: Kiểm tra affectedRows
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
         return res.status(200).json({ message: 'user deleted' });
     } catch (err) {
+        console.error(`Error in deleteUser (id: ${userId}):`, err);
         return res.status(500).json({ message: err.message });
     }
 };

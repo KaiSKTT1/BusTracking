@@ -19,6 +19,7 @@ import studentRouter from "./routes/parent/studentRoute.js";
 import guardiansRouter from "./routes/parent/guardiansRoute.js";
 import studentRideRouter from "./routes/parent/studentRideRoute.js";
 import stopRouter from "./routes/parent/stopRoute.js";
+import schoolRouter from "./routes/admin/schoolRoute.js";
 
 const app = express();
 const port = 3000;
@@ -44,6 +45,7 @@ app.use(["/students", "/student"], studentRouter);
 app.use(["/guardians", "/guardian"], guardiansRouter);
 app.use(["/student_rides", "/student_ride"], studentRideRouter);
 app.use(["/stops", "/stop"], stopRouter);
+app.use('/schools', schoolRouter);
 
 app.listen(port, () => {
   console.log(`✅ Server running at http://localhost:${port}`);

@@ -114,9 +114,13 @@ const Guardians = () => {
 
   const handleSaveEdit = async (updatedData) => {
     try {
+
+      // Dữ liệu "updatedData" đến từ EditModal (nó có name, email, status...)
+      console.log("Dữ liệu gửi lên để cập nhật:", updatedData); // Thêm log này để kiểm tra
       await api.put(`/guardians/${selectedGuardian.id}`, {
         username: updatedData.name,
-        email: updatedData.email
+        email: updatedData.email,
+        status: updatedData.status
       });
 
       toast("Guardian updated successfully!", { icon: "📝" });

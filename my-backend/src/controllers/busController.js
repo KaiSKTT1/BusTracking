@@ -1,9 +1,8 @@
 import pool from '../configs/connectDB.js';
 
-// GET all buses
 let getAllBuses = async (req, res) => {
+    console.log('Fetching all buses...');
     try {
-        // Sửa: Đổi tên cột. Bỏ JOIN tài xế vì 'driver_id' không còn trong bảng 'bus'
         const [rows] = await pool.execute(`
             SELECT 
                 bus_id as id, 
@@ -11,18 +10,17 @@ let getAllBuses = async (req, res) => {
                 capacity as seats
             FROM bus
         `);
-        // Lưu ý: Thông tin tài xế không còn ở đây theo schema mới
         return res.status(200).json({ message: 'ok', data: rows });
     } catch (err) {
+        console.error('Error in getAllBuses:', err);
         return res.status(500).json({ message: err.message });
     }
 };
 
-// GET bus by ID
 let getBusById = async (req, res) => {
     const { id } = req.params;
+    console.log(`Fetching bus with id: ${id}`);
     try {
-        // Sửa: Đổi tên cột, bỏ JOIN
         const [rows] = await pool.execute(`
             SELECT 
                 bus_id as id, 
@@ -37,14 +35,14 @@ let getBusById = async (req, res) => {
         }
         return res.status(200).json({ message: 'ok', data: rows[0] });
     } catch (err) {
+        console.error(`Error in getBusById (id: ${id}):`, err);
         return res.status(500).json({ message: err.message });
     }
 };
 
-// CREATE new bus
 let createBus = async (req, res) => {
-    // Sửa: Đổi tên cột, bỏ 'driver_id'
     const { license, capacity } = req.body;
+    console.log('Creating new bus with body:', req.body);
 
     if (!license || !capacity) {
         return res.status(400).json({
@@ -64,7 +62,6 @@ let createBus = async (req, res) => {
             });
         }
         
-        // Sửa: INSERT không có driver_id
         const [result] = await pool.execute(
             'INSERT INTO bus (license, capacity) VALUES (?, ?)',
             [license, capacity]
@@ -75,15 +72,15 @@ let createBus = async (req, res) => {
             data: { id: result.insertId }
         });
     } catch (err) {
+        console.error('Error in createBus:', err);
         return res.status(500).json({ message: err.message });
     }
 };
 
-// UPDATE bus
 let updateBus = async (req, res) => {
     const { id } = req.params;
-    // Sửa: Đổi tên cột, bỏ 'driver_id'
     const { license, capacity } = req.body;
+    console.log(`Updating bus ${id} with body:`, req.body);
 
     if (!license || !capacity) {
         return res.status(400).json({
@@ -112,23 +109,29 @@ let updateBus = async (req, res) => {
             });
         }
 
-        // Sửa: UPDATE không có driver_id
-        await pool.execute(
+        // Sửa: Lấy kết quả [result]
+        const [result] = await pool.execute(
             'UPDATE bus SET license = ?, capacity = ? WHERE bus_id = ?',
             [license, capacity, id]
         );
+
+        // Sửa: Kiểm tra affectedRows
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: 'Bus not found or data unchanged' });
+        }
 
         return res.status(200).json({
             message: 'Bus updated successfully'
         });
     } catch (err) {
+        console.error(`Error in updateBus (id: ${id}):`, err);
         return res.status(500).json({ message: err.message });
     }
 };
 
-// DELETE bus
 let deleteBus = async (req, res) => {
     const { id } = req.params;
+    console.log(`Deleting bus with id: ${id}`);
 
     try {
         const [bus] = await pool.execute(
@@ -140,7 +143,6 @@ let deleteBus = async (req, res) => {
             return res.status(404).json({ message: 'Bus not found' });
         }
 
-        // Sửa: Kiểm tra bảng 'timetable' (thay vì 'schedules')
         const [schedules] = await pool.execute(
             'SELECT timetable_id FROM timetable WHERE bus_id = ?',
             [id]
@@ -152,12 +154,19 @@ let deleteBus = async (req, res) => {
             });
         }
 
-        await pool.execute('DELETE FROM bus WHERE bus_id = ?', [id]);
+        // Sửa: Lấy kết quả [result]
+        const [result] = await pool.execute('DELETE FROM bus WHERE bus_id = ?', [id]);
+
+        // Sửa: Kiểm tra affectedRows
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: 'Bus not found' });
+        }
 
         return res.status(200).json({
             message: 'Bus deleted successfully'
         });
     } catch (err) {
+        console.error(`Error in deleteBus (id: ${id}):`, err);
         return res.status(500).json({ message: err.message });
     }
 };

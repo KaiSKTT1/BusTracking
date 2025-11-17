@@ -1,29 +1,11 @@
 import express from "express";
-import pool from "../../configs/connectDB.js";
+import scheduleController from "../../controllers/scheduleController.js"; // Sửa đường dẫn
 
 const router = express.Router();
 
-router.get("/", async (req, res) => {
-  try {
-    const [rows] = await pool.execute("SELECT * FROM student_ride");
-    res.json(rows);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: err.message });
-  }
-});
-
-router.post("/", async (req, res) => {
-  const { student_id, timetable_id } = req.body;
-  try {
-    await pool.execute(
-      "INSERT INTO student_ride (student_id, timetable_id) VALUES (?, ?)",
-      [student_id, timetable_id]
-    );
-    res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
+// Lấy danh sách học sinh trên 1 chuyến (timetable_id)
+router.get("/:id", scheduleController.getStudentsOnTimetable);
+// Thêm học sinh vào 1 chuyến
+router.post("/", scheduleController.addStudentToTimetable);
 
 export default router;

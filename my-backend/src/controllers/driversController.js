@@ -1,36 +1,37 @@
 import pool from '../configs/connectDB.js';
 
-// GET all drivers (role = 'Driver')
 let getAllDrivers = async (req, res) => {
+    console.log('Fetching all drivers...');
     try {
-        // Sửa: JOIN user_account với role, đổi tên cột
         const [rows] = await pool.execute(
             `SELECT 
                 ua.user_id as id, 
                 ua.username as name, 
                 ua.email, 
-                r.name_role as role
+                r.name_role as role,
+                ua.status
              FROM user_account ua
              JOIN role r ON ua.role_id = r.role_id
              WHERE r.name_role = 'Driver'`
         );
         return res.status(200).json({ message: 'ok', data: rows });
     } catch (err) {
+        console.error('Error in getAllDrivers:', err);
         return res.status(500).json({ message: err.message });
     }
 };
 
-// GET driver by ID
 let getDriverById = async (req, res) => {
     const { id } = req.params;
+    console.log(`Fetching driver with id: ${id}`);
     try {
-        // Sửa: JOIN và dùng user_id
         const [rows] = await pool.execute(
             `SELECT 
                 ua.user_id as id, 
                 ua.username as name, 
                 ua.email, 
-                r.name_role as role
+                r.name_role as role,
+                ua.status
              FROM user_account ua
              JOIN role r ON ua.role_id = r.role_id
              WHERE ua.user_id = ? AND r.name_role = 'Driver'`,
@@ -41,13 +42,13 @@ let getDriverById = async (req, res) => {
         }
         return res.status(200).json({ message: 'ok', data: rows[0] });
     } catch (err) {
+        console.error(`Error in getDriverById (id: ${id}):`, err);
         return res.status(500).json({ message: err.message });
     }
 };
 
-// CREATE new driver
 let createDriver = async (req, res) => {
-    // Sửa: dùng 'username', bỏ 'phone'
+    console.log('Creating new driver with body:', req.body);
     const { username, email, password } = req.body;
 
     if (!username || !email || !password) {
@@ -66,7 +67,6 @@ let createDriver = async (req, res) => {
             return res.status(400).json({ message: 'Email already exists' });
         }
         
-        // Sửa: INSERT vào user_account, role_id = 2 (là Driver)
         const [result] = await pool.execute(
             'INSERT INTO user_account (username, email, password, role_id, status) VALUES (?, ?, ?, 2, "active")',
             [username, email, password]
@@ -77,6 +77,7 @@ let createDriver = async (req, res) => {
             data: { id: result.insertId }
         });
     } catch (err) {
+        console.error('Error in createDriver:', err);
         return res.status(500).json({ message: err.message });
     }
 };
@@ -84,12 +85,14 @@ let createDriver = async (req, res) => {
 // UPDATE driver
 let updateDriver = async (req, res) => {
     const { id } = req.params;
-    // Sửa: dùng 'username', bỏ 'phone'
-    const { username, email, password } = req.body;
+    // SỬA 1: Thêm 'status' vào đây
+    const { username, email, password, status } = req.body;
+    console.log(`Updating driver ${id} with body:`, req.body);
 
-    if (!username || !email) {
+    // SỬA 2: Thêm 'status' vào validation
+    if (!username || !email || !status) {
         return res.status(400).json({
-            message: 'Missing required fields: username, email'
+            message: 'Missing required fields: username, email, status'
         });
     }
 
@@ -112,28 +115,34 @@ let updateDriver = async (req, res) => {
             return res.status(400).json({ message: 'Email already exists' });
         }
 
-        // Sửa: Cập nhật user_account
+        // SỬA 3: Cập nhật các câu query để bao gồm 'status'
+        let result;
         if (password) {
-            await pool.execute(
-                'UPDATE user_account SET username = ?, email = ?, password = ? WHERE user_id = ?',
-                [username, email, password, id]
+            [result] = await pool.execute(
+                'UPDATE user_account SET username = ?, email = ?, password = ?, status = ? WHERE user_id = ?',
+                [username, email, password, status, id]
             );
         } else {
-            await pool.execute(
-                'UPDATE user_account SET username = ?, email = ? WHERE user_id = ?',
-                [username, email, id]
+            [result] = await pool.execute(
+                'UPDATE user_account SET username = ?, email = ?, status = ? WHERE user_id = ?',
+                [username, email, status, id]
             );
+        }
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: 'Driver not found or data unchanged' });
         }
 
         return res.status(200).json({ message: 'Driver updated successfully' });
     } catch (err) {
+        console.error(`Error in updateDriver (id: ${id}):`, err);
         return res.status(500).json({ message: err.message });
     }
 };
 
-// DELETE driver
 let deleteDriver = async (req, res) => {
     const { id } = req.params;
+    console.log(`Deleting driver with id: ${id}`);
 
     try {
         const [driver] = await pool.execute(
@@ -145,7 +154,6 @@ let deleteDriver = async (req, res) => {
             return res.status(404).json({ message: 'Driver not found' });
         }
 
-        // Sửa: Kiểm tra bảng 'timetable' và 'trip' thay vì 'bus'
         const [timetables] = await pool.execute(
             'SELECT timetable_id FROM timetable WHERE driver_id = ?', [id]
         );
@@ -164,11 +172,17 @@ let deleteDriver = async (req, res) => {
             });
         }
 
-        // Sửa: Xoá khỏi user_account
-        await pool.execute('DELETE FROM user_account WHERE user_id = ?', [id]);
+        // Sửa: Lấy kết quả [result]
+        const [result] = await pool.execute('DELETE FROM user_account WHERE user_id = ?', [id]);
+
+        // Sửa: Kiểm tra affectedRows
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: 'Driver not found' });
+        }
 
         return res.status(200).json({ message: 'Driver deleted successfully' });
     } catch (err) {
+        console.error(`Error in deleteDriver (id: ${id}):`, err);
         return res.status(500).json({ message: err.message });
     }
 };
