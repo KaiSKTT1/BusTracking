@@ -11,11 +11,11 @@ export default function ParentLogin() {
     // thử endpoint auth nếu có
     try {
       const authRes = await api
-        .post("/auth/login", { username: email, password })
+        .post("/auth/login", {email, password })
         .catch(() => null);
       if (authRes?.data?.user) {
         const user = authRes.data.user;
-        if ((user.role_id ?? user.role) === 3) {
+        if ((user.role_id ?? user.role) === "Parent") {
           localStorage.setItem("parentLoggedIn", "true");
           localStorage.setItem("parentId", String(user.user_id ?? user.id));
           navigate("/parent/dashboard");
