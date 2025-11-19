@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import api from "../../utils/axios";
 
 export default function DriverLogin() {
-  const [emailOrUsername, setEmailOrUsername] = useState("");
+  const [email, setEmailOrUsername] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
@@ -11,11 +11,11 @@ export default function DriverLogin() {
     // Thử endpoint auth nếu tồn tại
     try {
       const authRes = await api
-        .post("/auth/login", { username: emailOrUsername, password })
+        .post("/auth/login", { email, password })
         .catch(() => null);
       if (authRes?.data?.user) {
         const user = authRes.data.user;
-        if ((user.role_id ?? user.role) === 2) {
+        if ((user.role_id ?? user.role) === "Driver") {
           localStorage.setItem("driverLoggedIn", "true");
           localStorage.setItem("driverId", String(user.user_id ?? user.id));
           navigate("/driver/pickupdropoff");
@@ -76,7 +76,7 @@ export default function DriverLogin() {
         <input
           type="text"
           placeholder="Email hoặc username"
-          value={emailOrUsername}
+          value={email}
           onChange={(e) => setEmailOrUsername(e.target.value)}
           className="w-full border rounded-md p-2 mb-4"
         />

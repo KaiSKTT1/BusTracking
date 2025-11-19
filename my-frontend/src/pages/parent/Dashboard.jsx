@@ -123,7 +123,7 @@ const Students = () => {
 
         <div className="flex justify-center mt-4 h-[400px]">
           {selectedStudent ? (
-            <MapView position={[selectedStudent.lat, selectedStudent.lng]} currentPosition={currentPosition} />
+            <MapView position={[selectedStudent.lat, selectedStudent.lng]} check={1} />
           ) : (
             <MapView position={[10.776889, 106.700806]} currentPosition={currentPosition} />
           )}
