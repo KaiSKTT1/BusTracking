@@ -1,8 +1,9 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import TitlePage from "../../components/title_pages/TitlePage";
 import { ICONS } from "../../config/ICONS";
 import Button from "../../components/button/Button";
 import MapView from "../../components/map/MapView";
+import api from "../../utils/axios";
 
 const School = () => {
   const AddressCardIcon = ICONS.School;
@@ -12,6 +13,32 @@ const School = () => {
     "173, 90 An Dương Vương, An Lạc, Bình Tân, Hồ Chí Minh, Vietnam"
   );
   const [loading, setLoading] = useState(false); //State loading
+
+  const [schools, setSchools] = useState([]);
+  const [schoolsLoading, setSchoolsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchSchools = async () => {
+      setSchoolsLoading(true);
+      try {
+        const res = await api.get("/schools");
+        const list = Array.isArray(res.data)
+          ? res.data
+          : Array.isArray(res.data?.data)
+          ? res.data.data
+          : [];
+        // map DB fields: school_id -> id, name -> name
+        setSchools(list.map((s) => ({ id: s.school_id ?? s.id, name: s.name })));
+      } catch (err) {
+        console.error("Error loading schools:", err);
+        setSchools([]);
+      } finally {
+        setSchoolsLoading(false);
+      }
+    };
+
+    fetchSchools();
+  }, []);
 
   //Hàm chuyển đổi tọa độ thành địa chỉ
   const getAddressFromCoordinates = async (lat, lon) => {
@@ -24,15 +51,14 @@ const School = () => {
       if (data && data.address) {
         const addr = data.address;
 
-        //Lọc ịa chỉ
         const parts = [
-          addr.house_number, // Số nhà (nếu có)
-          addr.road, // Tên đường
-          addr.suburb || addr.neighbourhood || addr.quarter, // Phường/Khu vực
-          addr.city_district || addr.district, // Quận
-          addr.city || addr.town, // Thành phố
-          addr.country, // Quốc gia
-        ].filter(Boolean); //Loại bỏ giá trị undefined/null
+          addr.house_number,
+          addr.road,
+          addr.suburb || addr.neighbourhood || addr.quarter,
+          addr.city_district || addr.district,
+          addr.city || addr.town,
+          addr.country,
+        ].filter(Boolean);
 
         return parts.join(", ");
       } else {
@@ -47,29 +73,23 @@ const School = () => {
   //Hàm lấy vị trí người dùng
   const handleUseCurrentLocation = () => {
     if (navigator.geolocation) {
-      setLoading(true); //Bật loading
+      setLoading(true);
 
       navigator.geolocation.getCurrentPosition(
         async (pos) => {
           const { latitude, longitude } = pos.coords;
 
-          console.log("📍 Vị trí mới:", latitude, longitude);
           setPosition([latitude, longitude]);
 
-          //Lấy địa chỉ từ tọa độ
-          const newAddress = await getAddressFromCoordinates(
-            latitude,
-            longitude
-          );
-          console.log("Địa chỉ mới:", newAddress);
+          const newAddress = await getAddressFromCoordinates(latitude, longitude);
           setAddress(newAddress);
 
-          setLoading(false); //Tắt loading
+          setLoading(false);
         },
         (err) => {
           alert("Không thể lấy vị trí của bạn! Hãy bật quyền định vị.");
           console.error(err);
-          setLoading(false); //Tắt loading khi lỗi
+          setLoading(false);
         },
         {
           enableHighAccuracy: true,
@@ -96,21 +116,30 @@ const School = () => {
         <div className="flex w-full space-x-6">
           <div className="w-96 bg-white shadow-md rounded-2xl p-5 flex flex-col justify-between">
             <div>
-              <h2 className="text-lg font-semibold text-gray-800 mb-2">
-                School Code
-              </h2>
+              <h2 className="text-lg font-semibold text-gray-800 mb-2">School Code</h2>
               <p className="text-gray-600 mb-4">#123</p>
 
-              <h2 className="text-lg font-semibold text-gray-800 mb-2">
-                Address Settings
-              </h2>
+              <h2 className="text-lg font-semibold text-gray-800 mb-2">Address Settings</h2>
 
-              {/*Hiển thị địa chỉ động */}
               {loading ? (
                 <p className="text-gray-400 italic">Đang lấy địa chỉ...</p>
               ) : (
                 <p className="text-gray-600">{address}</p>
               )}
+
+              <div className="mt-4">
+                <h3 className="text-sm font-medium text-gray-700 mb-2">Available Schools</h3>
+                {schoolsLoading ? (
+                  <p className="text-sm text-gray-500">Loading...</p>
+                ) : (
+                  <ul className="text-sm text-gray-600 list-disc pl-5">
+                    {schools.map((s) => (
+                      <li key={s.id}>{s.name}</li>
+                    ))}
+                    {schools.length === 0 && <li>No schools found</li>}
+                  </ul>
+                )}
+              </div>
             </div>
 
             <div className="mt-6">
@@ -118,7 +147,7 @@ const School = () => {
                 title={loading ? "Loading..." : "Use current location"}
                 icon={<AddressCardIcon className="text-white" size={18} />}
                 onClick={handleUseCurrentLocation}
-                disabled={loading} //Disable khi đang loading
+                disabled={loading}
               />
             </div>
           </div>

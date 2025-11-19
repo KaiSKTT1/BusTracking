@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Generation Time: Oct 16, 2025 at 12:57 PM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.0.30
+-- Máy chủ: 127.0.0.1
+-- Thời gian đã tạo: Th10 19, 2025 lúc 02:43 AM
+-- Phiên bản máy phục vụ: 10.4.32-MariaDB
+-- Phiên bản PHP: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,37 +18,38 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `bus_tracking`
+-- Cơ sở dữ liệu: `bus_tracking`
 --
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `baocao`
+-- Cấu trúc bảng cho bảng `baocao`
 --
 
 CREATE TABLE `baocao` (
   `bao_cao_id` int(11) NOT NULL,
   `admin_id` int(11) DEFAULT NULL,
   `driver_id` int(11) DEFAULT NULL,
-  `date` date DEFAULT NULL
+  `date` date DEFAULT NULL,
+  `type` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `baocao`
+-- Đang đổ dữ liệu cho bảng `baocao`
 --
 
-INSERT INTO `baocao` (`bao_cao_id`, `admin_id`, `driver_id`, `date`) VALUES
-(1, 1, 2, '2025-10-17'),
-(2, 1, 3, '2025-10-17'),
-(3, 1, 4, '2025-10-18'),
-(4, 1, 2, '2025-10-18'),
-(5, 1, 3, '2025-10-19');
+INSERT INTO `baocao` (`bao_cao_id`, `admin_id`, `driver_id`, `date`, `type`) VALUES
+(1, 1, 2, '2025-10-17', 0),
+(2, 1, 3, '2025-10-17', 0),
+(3, 1, 4, '2025-10-18', 0),
+(4, 1, 2, '2025-10-18', 0),
+(5, 1, 3, '2025-10-19', 0);
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `bus`
+-- Cấu trúc bảng cho bảng `bus`
 --
 
 CREATE TABLE `bus` (
@@ -58,7 +59,7 @@ CREATE TABLE `bus` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `bus`
+-- Đang đổ dữ liệu cho bảng `bus`
 --
 
 INSERT INTO `bus` (`bus_id`, `capacity`, `license`) VALUES
@@ -71,7 +72,7 @@ INSERT INTO `bus` (`bus_id`, `capacity`, `license`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `chitietbaocao`
+-- Cấu trúc bảng cho bảng `chitietbaocao`
 --
 
 CREATE TABLE `chitietbaocao` (
@@ -82,7 +83,7 @@ CREATE TABLE `chitietbaocao` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `chitietbaocao`
+-- Đang đổ dữ liệu cho bảng `chitietbaocao`
 --
 
 INSERT INTO `chitietbaocao` (`bao_cao_ct_id`, `bao_cao_id`, `student_id`, `tinh_trang`) VALUES
@@ -95,7 +96,20 @@ INSERT INTO `chitietbaocao` (`bao_cao_ct_id`, `bao_cao_id`, `student_id`, `tinh_
 -- --------------------------------------------------------
 
 --
--- Table structure for table `role`
+-- Cấu trúc bảng cho bảng `notification`
+--
+
+CREATE TABLE `notification` (
+  `ID` int(11) NOT NULL,
+  `admin_id` int(11) NOT NULL,
+  `parent_id` int(11) NOT NULL,
+  `messages` varchar(256) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Cấu trúc bảng cho bảng `role`
 --
 
 CREATE TABLE `role` (
@@ -105,7 +119,7 @@ CREATE TABLE `role` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `role`
+-- Đang đổ dữ liệu cho bảng `role`
 --
 
 INSERT INTO `role` (`role_id`, `name_role`, `note`) VALUES
@@ -116,7 +130,7 @@ INSERT INTO `role` (`role_id`, `name_role`, `note`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `route`
+-- Cấu trúc bảng cho bảng `route`
 --
 
 CREATE TABLE `route` (
@@ -126,7 +140,7 @@ CREATE TABLE `route` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `route`
+-- Đang đổ dữ liệu cho bảng `route`
 --
 
 INSERT INTO `route` (`route_id`, `name`, `so_stop`) VALUES
@@ -139,7 +153,7 @@ INSERT INTO `route` (`route_id`, `name`, `so_stop`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `route_stop`
+-- Cấu trúc bảng cho bảng `route_stop`
 --
 
 CREATE TABLE `route_stop` (
@@ -149,7 +163,7 @@ CREATE TABLE `route_stop` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `route_stop`
+-- Đang đổ dữ liệu cho bảng `route_stop`
 --
 
 INSERT INTO `route_stop` (`route_id`, `stop_current_id`, `stop_next_id`) VALUES
@@ -169,7 +183,7 @@ INSERT INTO `route_stop` (`route_id`, `stop_current_id`, `stop_next_id`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `school`
+-- Cấu trúc bảng cho bảng `school`
 --
 
 CREATE TABLE `school` (
@@ -178,7 +192,7 @@ CREATE TABLE `school` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `school`
+-- Đang đổ dữ liệu cho bảng `school`
 --
 
 INSERT INTO `school` (`school_id`, `name`) VALUES
@@ -188,35 +202,37 @@ INSERT INTO `school` (`school_id`, `name`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `stop`
+-- Cấu trúc bảng cho bảng `stop`
 --
 
 CREATE TABLE `stop` (
   `stop_id` int(11) NOT NULL,
   `name` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
-  `address` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL
+  `address` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
+  `lat` decimal(10,8) DEFAULT NULL,
+  `lng` decimal(11,8) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `stop`
+-- Đang đổ dữ liệu cho bảng `stop`
 --
 
-INSERT INTO `stop` (`stop_id`, `name`, `address`) VALUES
-(1, 'Trạm A', '123 Lê Lợi'),
-(2, 'Trạm B', '456 Nguyễn Trãi'),
-(3, 'Trạm C', '789 Cách Mạng Tháng 8'),
-(4, 'Trạm D', '101 Nguyễn Văn Cừ'),
-(5, 'Trạm E', '202 Điện Biên Phủ'),
-(6, 'Trạm F', '303 Trường Chinh'),
-(7, 'Trạm G', '404 Cộng Hòa'),
-(8, 'Trạm H', '505 Võ Văn Kiệt'),
-(9, 'Trạm I', '606 Hoàng Hoa Thám'),
-(10, 'Trạm J', '707 Lý Thường Kiệt');
+INSERT INTO `stop` (`stop_id`, `name`, `address`, `lat`, `lng`) VALUES
+(1, 'Trạm A', '123 Lê Lợi', 10.77500000, 106.70000000),
+(2, 'Trạm B', '456 Nguyễn Trãi', 10.75800000, 106.67800000),
+(3, 'Trạm C', '789 Cách Mạng Tháng 8', 10.78000000, 106.68700000),
+(4, 'Trạm D', '101 Nguyễn Văn Cừ', 10.76200000, 106.68000000),
+(5, 'Trạm E', '202 Điện Biên Phủ', 10.79600000, 106.70900000),
+(6, 'Trạm F', '303 Trường Chinh', 10.80300000, 106.63800000),
+(7, 'Trạm G', '404 Cộng Hòa', 10.80600000, 106.64900000),
+(8, 'Trạm H', '505 Võ Văn Kiệt', 10.75000000, 106.69000000),
+(9, 'Trạm I', '606 Hoàng Hoa Thám', 10.80000000, 106.64300000),
+(10, 'Trạm J', '707 Lý Thường Kiệt', 10.76800000, 106.65400000);
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `student`
+-- Cấu trúc bảng cho bảng `student`
 --
 
 CREATE TABLE `student` (
@@ -228,7 +244,7 @@ CREATE TABLE `student` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `student`
+-- Đang đổ dữ liệu cho bảng `student`
 --
 
 INSERT INTO `student` (`student_id`, `name`, `school_id`, `note`, `id_ph`) VALUES
@@ -241,7 +257,7 @@ INSERT INTO `student` (`student_id`, `name`, `school_id`, `note`, `id_ph`) VALUE
 -- --------------------------------------------------------
 
 --
--- Table structure for table `student_ride`
+-- Cấu trúc bảng cho bảng `student_ride`
 --
 
 CREATE TABLE `student_ride` (
@@ -250,7 +266,7 @@ CREATE TABLE `student_ride` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `student_ride`
+-- Đang đổ dữ liệu cho bảng `student_ride`
 --
 
 INSERT INTO `student_ride` (`timetable_id`, `student_id`) VALUES
@@ -263,7 +279,7 @@ INSERT INTO `student_ride` (`timetable_id`, `student_id`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `timetable`
+-- Cấu trúc bảng cho bảng `timetable`
 --
 
 CREATE TABLE `timetable` (
@@ -275,7 +291,7 @@ CREATE TABLE `timetable` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `timetable`
+-- Đang đổ dữ liệu cho bảng `timetable`
 --
 
 INSERT INTO `timetable` (`timetable_id`, `planned_date`, `trip_id`, `driver_id`, `bus_id`) VALUES
@@ -288,7 +304,7 @@ INSERT INTO `timetable` (`timetable_id`, `planned_date`, `trip_id`, `driver_id`,
 -- --------------------------------------------------------
 
 --
--- Table structure for table `trip`
+-- Cấu trúc bảng cho bảng `trip`
 --
 
 CREATE TABLE `trip` (
@@ -301,7 +317,7 @@ CREATE TABLE `trip` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `trip`
+-- Đang đổ dữ liệu cho bảng `trip`
 --
 
 INSERT INTO `trip` (`trip_id`, `effective_date`, `time_arrival_first`, `time_arrival_end`, `route_id`, `driver_id`) VALUES
@@ -314,7 +330,7 @@ INSERT INTO `trip` (`trip_id`, `effective_date`, `time_arrival_first`, `time_arr
 -- --------------------------------------------------------
 
 --
--- Table structure for table `user_account`
+-- Cấu trúc bảng cho bảng `user_account`
 --
 
 CREATE TABLE `user_account` (
@@ -327,7 +343,7 @@ CREATE TABLE `user_account` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `user_account`
+-- Đang đổ dữ liệu cho bảng `user_account`
 --
 
 INSERT INTO `user_account` (`user_id`, `role_id`, `username`, `password`, `email`, `status`) VALUES
@@ -339,11 +355,11 @@ INSERT INTO `user_account` (`user_id`, `role_id`, `username`, `password`, `email
 (6, 3, 'parent2', 'parent123', 'parent2@example.com', 'active');
 
 --
--- Indexes for dumped tables
+-- Chỉ mục cho các bảng đã đổ
 --
 
 --
--- Indexes for table `baocao`
+-- Chỉ mục cho bảng `baocao`
 --
 ALTER TABLE `baocao`
   ADD PRIMARY KEY (`bao_cao_id`),
@@ -351,13 +367,13 @@ ALTER TABLE `baocao`
   ADD KEY `driver_id` (`driver_id`);
 
 --
--- Indexes for table `bus`
+-- Chỉ mục cho bảng `bus`
 --
 ALTER TABLE `bus`
   ADD PRIMARY KEY (`bus_id`);
 
 --
--- Indexes for table `chitietbaocao`
+-- Chỉ mục cho bảng `chitietbaocao`
 --
 ALTER TABLE `chitietbaocao`
   ADD PRIMARY KEY (`bao_cao_ct_id`),
@@ -365,19 +381,25 @@ ALTER TABLE `chitietbaocao`
   ADD KEY `student_id` (`student_id`);
 
 --
--- Indexes for table `role`
+-- Chỉ mục cho bảng `notification`
+--
+ALTER TABLE `notification`
+  ADD PRIMARY KEY (`ID`);
+
+--
+-- Chỉ mục cho bảng `role`
 --
 ALTER TABLE `role`
   ADD PRIMARY KEY (`role_id`);
 
 --
--- Indexes for table `route`
+-- Chỉ mục cho bảng `route`
 --
 ALTER TABLE `route`
   ADD PRIMARY KEY (`route_id`);
 
 --
--- Indexes for table `route_stop`
+-- Chỉ mục cho bảng `route_stop`
 --
 ALTER TABLE `route_stop`
   ADD PRIMARY KEY (`route_id`,`stop_current_id`,`stop_next_id`),
@@ -385,19 +407,19 @@ ALTER TABLE `route_stop`
   ADD KEY `stop_next_id` (`stop_next_id`);
 
 --
--- Indexes for table `school`
+-- Chỉ mục cho bảng `school`
 --
 ALTER TABLE `school`
   ADD PRIMARY KEY (`school_id`);
 
 --
--- Indexes for table `stop`
+-- Chỉ mục cho bảng `stop`
 --
 ALTER TABLE `stop`
   ADD PRIMARY KEY (`stop_id`);
 
 --
--- Indexes for table `student`
+-- Chỉ mục cho bảng `student`
 --
 ALTER TABLE `student`
   ADD PRIMARY KEY (`student_id`),
@@ -405,14 +427,14 @@ ALTER TABLE `student`
   ADD KEY `FK_Student_User` (`id_ph`);
 
 --
--- Indexes for table `student_ride`
+-- Chỉ mục cho bảng `student_ride`
 --
 ALTER TABLE `student_ride`
   ADD PRIMARY KEY (`timetable_id`,`student_id`),
   ADD KEY `student_id` (`student_id`);
 
 --
--- Indexes for table `timetable`
+-- Chỉ mục cho bảng `timetable`
 --
 ALTER TABLE `timetable`
   ADD PRIMARY KEY (`timetable_id`),
@@ -421,7 +443,7 @@ ALTER TABLE `timetable`
   ADD KEY `bus_id` (`bus_id`);
 
 --
--- Indexes for table `trip`
+-- Chỉ mục cho bảng `trip`
 --
 ALTER TABLE `trip`
   ADD PRIMARY KEY (`trip_id`),
@@ -429,32 +451,42 @@ ALTER TABLE `trip`
   ADD KEY `driver_id` (`driver_id`);
 
 --
--- Indexes for table `user_account`
+-- Chỉ mục cho bảng `user_account`
 --
 ALTER TABLE `user_account`
   ADD PRIMARY KEY (`user_id`),
   ADD KEY `role_id` (`role_id`);
 
 --
--- Constraints for dumped tables
+-- AUTO_INCREMENT cho các bảng đã đổ
 --
 
 --
--- Constraints for table `baocao`
+-- AUTO_INCREMENT cho bảng `notification`
+--
+ALTER TABLE `notification`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- Các ràng buộc cho các bảng đã đổ
+--
+
+--
+-- Các ràng buộc cho bảng `baocao`
 --
 ALTER TABLE `baocao`
   ADD CONSTRAINT `baocao_ibfk_1` FOREIGN KEY (`admin_id`) REFERENCES `user_account` (`user_id`),
   ADD CONSTRAINT `baocao_ibfk_2` FOREIGN KEY (`driver_id`) REFERENCES `user_account` (`user_id`);
 
 --
--- Constraints for table `chitietbaocao`
+-- Các ràng buộc cho bảng `chitietbaocao`
 --
 ALTER TABLE `chitietbaocao`
   ADD CONSTRAINT `chitietbaocao_ibfk_1` FOREIGN KEY (`bao_cao_id`) REFERENCES `baocao` (`bao_cao_id`),
   ADD CONSTRAINT `chitietbaocao_ibfk_2` FOREIGN KEY (`student_id`) REFERENCES `student` (`student_id`);
 
 --
--- Constraints for table `route_stop`
+-- Các ràng buộc cho bảng `route_stop`
 --
 ALTER TABLE `route_stop`
   ADD CONSTRAINT `route_stop_ibfk_1` FOREIGN KEY (`route_id`) REFERENCES `route` (`route_id`),
@@ -462,21 +494,21 @@ ALTER TABLE `route_stop`
   ADD CONSTRAINT `route_stop_ibfk_3` FOREIGN KEY (`stop_next_id`) REFERENCES `stop` (`stop_id`);
 
 --
--- Constraints for table `student`
+-- Các ràng buộc cho bảng `student`
 --
 ALTER TABLE `student`
   ADD CONSTRAINT `FK_Student_User` FOREIGN KEY (`id_ph`) REFERENCES `user_account` (`user_id`),
   ADD CONSTRAINT `student_ibfk_1` FOREIGN KEY (`school_id`) REFERENCES `school` (`school_id`);
 
 --
--- Constraints for table `student_ride`
+-- Các ràng buộc cho bảng `student_ride`
 --
 ALTER TABLE `student_ride`
   ADD CONSTRAINT `student_ride_ibfk_1` FOREIGN KEY (`timetable_id`) REFERENCES `timetable` (`timetable_id`),
   ADD CONSTRAINT `student_ride_ibfk_2` FOREIGN KEY (`student_id`) REFERENCES `student` (`student_id`);
 
 --
--- Constraints for table `timetable`
+-- Các ràng buộc cho bảng `timetable`
 --
 ALTER TABLE `timetable`
   ADD CONSTRAINT `timetable_ibfk_1` FOREIGN KEY (`trip_id`) REFERENCES `trip` (`trip_id`),
@@ -484,14 +516,14 @@ ALTER TABLE `timetable`
   ADD CONSTRAINT `timetable_ibfk_3` FOREIGN KEY (`bus_id`) REFERENCES `bus` (`bus_id`);
 
 --
--- Constraints for table `trip`
+-- Các ràng buộc cho bảng `trip`
 --
 ALTER TABLE `trip`
   ADD CONSTRAINT `trip_ibfk_1` FOREIGN KEY (`route_id`) REFERENCES `route` (`route_id`),
   ADD CONSTRAINT `trip_ibfk_2` FOREIGN KEY (`driver_id`) REFERENCES `user_account` (`user_id`);
 
 --
--- Constraints for table `user_account`
+-- Các ràng buộc cho bảng `user_account`
 --
 ALTER TABLE `user_account`
   ADD CONSTRAINT `user_account_ibfk_1` FOREIGN KEY (`role_id`) REFERENCES `role` (`role_id`);

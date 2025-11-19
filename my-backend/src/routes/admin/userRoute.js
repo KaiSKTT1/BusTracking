@@ -1,5 +1,6 @@
 import express from "express";
-import userController from "../controllers/userController.js";
+import userController from "../../controllers/userController.js"; // Sửa đường dẫn
+
 const router = express.Router();
 
 router.get("/", userController.getAllUsers);

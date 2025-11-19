@@ -1,0 +1,13 @@
+{
+  "name": "bus-tracking",
+  "private": true,
+  "scripts": {
+    "backend": "npm --prefix my-backend run dev",
+    "frontend": "npm --prefix my-frontend start",
+    "dev": "concurrently \"npm:backend\" \"npm:frontend\"",
+    "start": "npm run dev"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  }
+}

@@ -1,5 +1,5 @@
 import express from "express";
-import studentController from "../controllers/studentController.js";
+import studentController from "../../controllers/studentController.js"; // Sửa đường dẫn
 
 const router = express.Router();
 
