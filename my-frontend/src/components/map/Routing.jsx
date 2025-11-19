@@ -12,27 +12,28 @@ const Routing = ({ start, end }) => {
     useEffect(() => {
         if (!map || !start || !end) return;
 
-        const routingControl = L.Routing.control({
-            waypoints: [
-                L.latLng(start[0], start[1]),
-                L.latLng(end[0], end[1]),
-            ],
-            lineOptions: {
-                styles: [{ color: "blue", weight: 5 }],
-            },
-            show: false,
-            addWaypoints: false,
-            draggableWaypoints: false,
-        });
-        routingControl.addTo(map);
-        routingControl.on("routesfound", function (e) {
-            const coords = e.routes[0].coordinates; // lấy route đầu tiên
-            setRoutePoints(coords);
-        });
-        return () => {
-            if (map && routingControl)
-                map.removeControl(routingControl);
-        }
+            const routingControl = L.Routing.control({
+                waypoints: [
+                    L.latLng(start[0], start[1]),
+                    L.latLng(end[0], end[1]),
+                ],
+                lineOptions: {
+                    styles: [{ color: "blue", weight: 5 }],
+                },
+                show: false,
+                addWaypoints: false,
+                draggableWaypoints: false,
+            });
+            routingControl.addTo(map);
+            routingControl.on("routesfound", function (e) {
+                console.log("Route found:", e);
+                const coords = e.routes[0].coordinates; // lấy route đầu tiên
+                setRoutePoints(coords);
+            });
+            return () => {
+                if (map && routingControl)
+                    map.removeControl(routingControl);
+            }
 
     }, [map, start, end]);
 

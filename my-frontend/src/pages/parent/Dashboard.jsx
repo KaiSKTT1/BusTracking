@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
+import axios from "axios";
+import api from "../../utils/axios.jsx";
 import TitlePage from "../../components/title_pages/TitlePage";
 import Header from "../../components/header/Header";
 import { ICONS } from "../../config/ICONS";
@@ -13,16 +15,6 @@ import "leaflet/dist/leaflet.css";
 import MapView from "../../components/map/MapView";
 
 const Students = () => {
-
-    const mockData = {
-        active: [
-            { id: 1, name: "John Doe", age: 16, grade: "10th", status: "active", lat: 10.762622, lng: 106.660172 },
-            { id: 2, name: "Jane Smith", age: 17, grade: "11th", status: "active", lat: 10.776889, lng: 106.700806 },
-        ],
-        inactive: [
-            { id: 3, name: "Mike Johnson", age: 18, grade: "12th", status: "inactive", lat: 21.028511, lng: 105.804817 },
-        ],
-    };
     const [activeTab, setActiveTab] = useState("active");
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -33,18 +25,60 @@ const Students = () => {
     const [currentPosition, setCurrentPosition] = useState(null); // Vị trí mặc định (HCM)
     const [index, setIndex] = useState(0);
 
-    const fetchStudents = async () => {
-        try {
-            setData(mockData[activeTab] || []);
-        }
-        catch (error) {
-            console.error("Error fetching students:", error);
-            setData([]);
-        }
-        finally {
-            setLoading(false);
-        }
-    }
+    // const fetchStudents = async () => {
+    //         try {
+    //         setData(mockData[activeTab] || []);
+    //     }
+    //     catch (error) {
+    //         console.error("Error fetching students:", error);
+    //         setData([]);
+    //     }
+    //     finally {
+    //         setLoading(false);
+    //     }
+    // }
+
+
+//     const fetchStudents = async () => {
+//     try {
+//         const res = await api.get("/students");
+
+//         // Xử lý dữ liệu ngay tại đây
+//         const processed = res.data.map((item, i) => ({
+//             ...item,
+//             index: i + 1
+//         }));
+
+//         // Cập nhật state
+//         setData(processed);
+
+//         console.log("Fetched students:", processed);
+//     } 
+//     catch (error) {
+//         console.error("Error fetching students:", error);
+//         setData([]);
+//     } 
+//     finally {
+//         setLoading(false);
+//     }
+// };
+
+
+    useEffect(() => {
+        api.get("/students")
+            .then((res) => {
+                console.log("Fetched students:", res.data);
+
+                // Dùng res.data ngay thay vì mockData (vì mockData chưa cập nhật)
+                setData(res.data || []);
+                setLoading(false);
+            })
+            .catch((err) => {
+                console.error("Error fetching students:", err);
+            });
+    }, [activeTab]);
+
+
     const totalPages = Math.ceil(data.length / rowsPerPage);
 
     const indexOfLast = currentPage * rowsPerPage;         // ví dụ: 1*5 = 5
@@ -72,9 +106,9 @@ const Students = () => {
         }
     };
 
-    useEffect(() => {
-        fetchStudents();
-    }, [activeTab]);
+    // useEffect(() => {
+    //     fetchStudents();
+    // }, [activeTab]);
 
     const handleRowClick = (student) => {
         setSelectedStudent(student);
@@ -82,7 +116,7 @@ const Students = () => {
     };
 
 
-    
+
 
     return (
         <>

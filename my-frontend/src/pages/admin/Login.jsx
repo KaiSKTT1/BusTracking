@@ -1,21 +1,30 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { loginUser } from "../../redux/apiRequest";
+
 
 export default function AdminLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const handleLogin = () => {
-    // Tài khoản demo cho Admin
-    if (email === "admin@gmail.com" && password === "admin123") {
-      // Lưu trạng thái đăng nhập vào localStorage
-      localStorage.setItem("adminLoggedIn", "true");
-      // Chuyển hướng tới dashboard của Admin
-      navigate("/admin/dashboard");
-    } else {
-      alert("Sai email hoặc mật khẩu! (demo: admin@gmail.com / admin123)");
-    }
+  // const handleLogin = () => {
+  //   // Tài khoản demo cho Admin
+  //   if (email === "admin@gmail.com" && password === "admin123") {
+  //     // Lưu trạng thái đăng nhập vào localStorage
+  //     localStorage.setItem("adminLoggedIn", "true");
+  //     // Chuyển hướng tới dashboard của Admin
+  //     navigate("/admin/dashboard");
+  //   } else {
+  //     alert("Sai email hoặc mật khẩu! (demo: admin@gmail.com / admin123)");
+  //   }
+  // };
+  const handleLogin = (e) => {
+    e.preventDefault();
+    const user = { email, password, role_id: 1 };
+    loginUser(user, dispatch, navigate);
   };
 
   return (
