@@ -1,6 +1,4 @@
-
 import React, { useState, useEffect } from "react";
-
 import { motion } from "framer-motion";
 import { ICONS } from "../../config/ICONS";
 import Header from "../../components/header/Header";
@@ -10,6 +8,7 @@ import api from "../../utils/axios";
 const PickupDropoff = () => {
   const [students, setStudents] = useState([]);
   const [history, setHistory] = useState([]);
+  const [selectedDate, setSelectedDate] = useState(() => new Date().toISOString().split("T")[0]); // mặc định hôm nay
   const StudentIcon = ICONS.Students;
 
   const currentDriverId = Number(localStorage.getItem("driverId")) || 3;
@@ -19,46 +18,20 @@ const PickupDropoff = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Lấy danh sách students theo student_ride -> timetable của driver
   const loadPickups = async () => {
     try {
-      // lấy tất cả timetable của driver
-      const tRes = await api.get("/timetable");
-      const timetables = Array.isArray(tRes.data) ? tRes.data : Array.isArray(tRes.data?.data) ? tRes.data.data : [];
-      const myTimetableIds = timetables.filter((t) => Number(t.driver_id) === currentDriverId).map((t) => t.timetable_id);
-
-      if (myTimetableIds.length === 0) {
-        setStudents([]);
-        return;
-      }
-
-      const srRes = await api.get("/student_ride");
-      const rides = Array.isArray(srRes.data) ? srRes.data : Array.isArray(srRes.data?.data) ? srRes.data.data : [];
-
-      const studentIds = rides.filter((r) => myTimetableIds.includes(Number(r.timetable_id))).map((r) => r.student_id);
-
-      // fetch students
-      const stRes = await api.get("/student");
-      const studentsAll = Array.isArray(stRes.data) ? stRes.data : Array.isArray(stRes.data?.data) ? stRes.data.data : [];
-
-      const selectedStudents = studentsAll
-        .filter((s) => studentIds.includes(Number(s.student_id)))
-        .map((s, idx) => ({
-          id: s.student_id ?? `S${idx + 1}`,
-          name: s.name ?? s.username ?? "N/A",
-          class: s.note ?? "N/A",
-          bus: `Bus for timetable`,
-          currentStatus: "Chưa đón",
-        }));
-
+      const stRes = await api.get(`/timetable/driver/${currentDriverId}/date/${selectedDate}/students`);
+      const selectedStudents = stRes.data.map((s, idx) => ({
+        id: s.student_id ?? `S${idx + 1}`,
+        name: s.name ?? "N/A",
+        class: s.note ?? "N/A",
+        bus: `Bus #${s.bus_id}`,
+        currentStatus: "Chưa đón",
+      }));
       setStudents(selectedStudents);
     } catch (err) {
       console.error("Error loading pickup list:", err);
-      // fallback demo
-      setStudents([
-        { id: "S001", name: "Nguyen Van A", class: "1A", bus: "Bus 01", currentStatus: "Chưa đón" },
-        { id: "S002", name: "Tran Thi B", class: "2B", bus: "Bus 02", currentStatus: "Đã đón" },
-      ]);
+      setStudents([]);
     }
   };
 
@@ -86,14 +59,44 @@ const PickupDropoff = () => {
     setHistory([newRecord, ...history]);
   };
 
-
   return (
     <>
       <Header />
       <div className="p-6">
-        <TitlePage title="Danh sách học sinh cần đón / trả" icon={<StudentIcon className="text-green-700" size={30} />} size="text-2xl" color="text-gray-700" className="mb-6" />
+        <TitlePage
+          title="Danh sách học sinh cần đón / trả"
+          icon={<StudentIcon className="text-green-700" size={30} />}
+          size="text-2xl"
+          color="text-gray-700"
+          className="mb-6"
+        />
 
-        <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} className="bg-white p-6 rounded-xl shadow-md max-w-4xl mx-auto">
+        {/* Date picker */}
+        <div className="mb-4 flex items-center gap-3">
+          <label htmlFor="date" className="text-gray-700 font-medium">
+            Chọn ngày:
+          </label>
+          <input
+            type="date"
+            id="date"
+            value={selectedDate}
+            onChange={(e) => setSelectedDate(e.target.value)}
+            className="border rounded px-2 py-1"
+          />
+          <button
+            onClick={loadPickups}
+            className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 transition"
+          >
+            Hiển thị
+          </button>
+        </div>
+
+        {/* Table học sinh */}
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-white p-6 rounded-xl shadow-md max-w-4xl mx-auto"
+        >
           <table className="w-full text-sm border-collapse">
             <thead>
               <tr className="bg-gray-100 text-gray-700">
@@ -113,14 +116,33 @@ const PickupDropoff = () => {
                   <td className="border p-2">{s.class}</td>
                   <td className="border p-2">{s.bus}</td>
                   <td className="border p-2">
-                    <span className={`px-2 py-1 rounded-full text-white text-xs ${s.currentStatus === "Chưa đón" ? "bg-gray-500" : s.currentStatus === "Đã đón" ? "bg-blue-600" : "bg-green-600"}`}>{s.currentStatus}</span>
+                    <span
+                      className={`px-2 py-1 rounded-full text-white text-xs ${s.currentStatus === "Chưa đón"
+                        ? "bg-gray-500"
+                        : s.currentStatus === "Đã đón"
+                          ? "bg-blue-600"
+                          : "bg-green-600"
+                        }`}
+                    >
+                      {s.currentStatus}
+                    </span>
                   </td>
                   <td className="border p-2">
                     {s.currentStatus === "Chưa đón" && (
-                      <button onClick={() => handleAction(s.id, "pickup")} className="bg-blue-600 text-white px-3 py-1 rounded-lg hover:bg-blue-700 transition">✅ Đón</button>
+                      <button
+                        onClick={() => handleAction(s.id, "pickup")}
+                        className="bg-blue-600 text-white px-3 py-1 rounded-lg hover:bg-blue-700 transition"
+                      >
+                        ✅ Đón
+                      </button>
                     )}
                     {s.currentStatus === "Đã đón" && (
-                      <button onClick={() => handleAction(s.id, "drop")} className="bg-yellow-500 text-white px-3 py-1 rounded-lg hover:bg-yellow-600 transition">🚗 Trả</button>
+                      <button
+                        onClick={() => handleAction(s.id, "drop")}
+                        className="bg-yellow-500 text-white px-3 py-1 rounded-lg hover:bg-yellow-600 transition"
+                      >
+                        🚗 Trả
+                      </button>
                     )}
                   </td>
                 </tr>
@@ -129,8 +151,13 @@ const PickupDropoff = () => {
           </table>
         </motion.div>
 
+        {/* Lịch sử */}
         {history.length > 0 && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-white mt-8 p-6 rounded-xl shadow-md max-w-3xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="bg-white mt-8 p-6 rounded-xl shadow-md max-w-3xl mx-auto"
+          >
             <h3 className="text-lg font-semibold text-gray-800 mb-3">📜 Lịch sử đón / trả</h3>
             <table className="w-full text-sm border-collapse">
               <thead>
@@ -157,7 +184,6 @@ const PickupDropoff = () => {
       </div>
     </>
   );
-
 };
 
 export default PickupDropoff;

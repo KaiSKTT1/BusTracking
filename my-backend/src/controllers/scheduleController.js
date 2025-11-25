@@ -64,7 +64,7 @@ let createTimetable = async (req, res) => {
 
 // Lấy lịch trình theo ngày
 let getTimetableByDate = async (req, res) => {
-    const { date } = req.params; 
+    const { date } = req.params;
     console.log(`Fetching timetable for date: ${date}`);
     try {
         const [rows] = await pool.execute(`
@@ -123,6 +123,95 @@ let getStudentsOnTimetable = async (req, res) => {
         return res.status(500).json({ message: err.message });
     }
 };
+let getAllTimetables = async (req, res) => {
+    console.log('Fetching all timetables...');
+    try {
+        const [rows] = await pool.execute(`
+            SELECT 
+                tt.timetable_id, 
+                tt.planned_date,
+                t.time_arrival_first,
+                t.time_arrival_end,
+                r.name as route_name,
+                ua.username as driver_name,
+                b.license as bus_license
+            FROM timetable tt
+            JOIN trip t ON tt.trip_id = t.trip_id
+            JOIN route r ON t.route_id = r.route_id
+            JOIN user_account ua ON tt.driver_id = ua.user_id
+            JOIN bus b ON tt.bus_id = b.bus_id
+        `);
+        return res.status(200).json({ message: 'ok', data: rows });
+    } catch (err) {
+        console.error('Error in getAllTimetables:', err);
+        return res.status(500).json({ message: err.message });
+    }
+};
+let getStudentsByDriver = async (req, res) => {
+    const { driverId } = req.params;
+    try {
+        const [rows] = await pool.execute(`
+      SELECT s.student_id, s.name, s.note, tt.timetable_id, tt.bus_id
+      FROM student s
+      JOIN student_ride sr ON s.student_id = sr.student_id
+      JOIN timetable tt ON sr.timetable_id = tt.timetable_id
+      WHERE tt.driver_id = ?
+    `, [driverId]);
+        res.status(200).json(rows);
+    } catch (err) {
+        console.error("Error in getStudentsByDriver:", err);
+        res.status(500).json({ message: err.message });
+    }
+};
+let getStudentsByDriverAndDate = async (req, res) => {
+    const { driverId, date } = req.params;
+    try {
+        const [rows] = await pool.execute(`
+      SELECT s.student_id, s.name, s.note, tt.timetable_id, tt.bus_id
+      FROM student s
+      JOIN student_ride sr ON s.student_id = sr.student_id
+      JOIN timetable tt ON sr.timetable_id = tt.timetable_id
+      WHERE tt.driver_id = ? AND tt.planned_date = ?
+    `, [driverId, date]);
+        res.status(200).json(rows);
+    } catch (err) {
+        console.error("Error in getStudentsByDriverAndDate:", err);
+        res.status(500).json({ message: err.message });
+    }
+};
+let getRoutesByDriver = async (req, res) => {
+    const { driverId } = req.params;
+
+    try {
+        const [rows] = await pool.execute(`
+            SELECT DISTINCT 
+                r.route_id,
+                r.name AS route_name,
+                r.so_stop,
+                t.time_arrival_first,
+                t.time_arrival_end,
+                tt.planned_date,
+                b.bus_id,
+                b.capacity,
+                b.license AS bus_license
+            FROM timetable tt
+            JOIN trip t ON tt.trip_id = t.trip_id
+            JOIN route r ON t.route_id = r.route_id
+            JOIN bus b ON tt.bus_id = b.bus_id
+            WHERE tt.driver_id = ?
+            ORDER BY r.route_id;
+        `, [driverId]);
+
+        return res.status(200).json({
+            message: "ok",
+            data: rows
+        });
+    } catch (err) {
+        console.error("Error in getRoutesByDriver:", err);
+        return res.status(500).json({ message: err.message });
+    }
+};
+
 
 
 export default {
@@ -131,6 +220,10 @@ export default {
     createTimetable,
     getTimetableByDate,
     addStudentToTimetable,
-    getStudentsOnTimetable
+    getStudentsOnTimetable,
+    getAllTimetables,
+    getStudentsByDriver,
+    getStudentsByDriverAndDate,
+    getRoutesByDriver
     // Thêm các hàm delete... nếu cần
 };
