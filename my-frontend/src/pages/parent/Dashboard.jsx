@@ -1,7 +1,5 @@
 
 import React, { useState, useEffect } from "react";
-
-import React, { useState, useEffect } from "react";
 import TitlePage from "../../components/title_pages/TitlePage";
 import Header from "../../components/header/Header";
 import { ICONS } from "../../config/ICONS";
@@ -12,34 +10,22 @@ import Table from "../../components/table/Table";
 import "leaflet/dist/leaflet.css";
 import MapView from "../../components/map/MapView";
 import api from "../../utils/axios";
-import api from "../../utils/axios";
+
 
 const Students = () => {
-  const StudentIcon = ICONS.Students;
-  const PlusIcon = ICONS.plus;
+ const StudentIcon = ICONS.Students;
+const PlusIcon = ICONS.plus;
 
-  const [activeTab, setActiveTab] = useState("active");
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
-  const StudentIcon = ICONS.Students;
-  const PlusIcon = ICONS.plus;
+const [activeTab, setActiveTab] = useState("active");
+const [data, setData] = useState([]);
+const [loading, setLoading] = useState(true);
+const [currentPage, setCurrentPage] = useState(1);
+const [rowsPerPage, setRowsPerPage] = useState(5);
 
-  const [activeTab, setActiveTab] = useState("active");
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+const [selectedStudent, setSelectedStudent] = useState(null);
+const [currentPosition, setCurrentPosition] = useState(null);
 
-  const [selectedStudent, setSelectedStudent] = useState(null);
-  const [currentPosition, setCurrentPosition] = useState(null);
-
-  const parentId = Number(localStorage.getItem("parentId")) || null;
-  const [selectedStudent, setSelectedStudent] = useState(null);
-  const [currentPosition, setCurrentPosition] = useState(null);
-
-  const parentId = Number(localStorage.getItem("parentId")) || null;
+const parentId = Number(localStorage.getItem("parentId")) || null;
 
   const fetchStudents = async () => {
     setLoading(true);
@@ -52,8 +38,26 @@ const Students = () => {
       const myStudents = parentId ? students.filter((s) => Number(s.id_ph) === Number(parentId)) : students;
 
       // lọc theo tab
+       const transformedData = rawStudents.map((s) => ({
+        id: s.student_id ?? s.id,
+        name: s.name ?? "",
+        parentName: s.parent_name ?? "N/A",
+        parentEmail: s.parent_email ?? "N/A",
+        parentPhone: s.parent_phone ?? "N/A",
+        status: "Active", // Mặc định là Active, có thể thay đổi sau
+        morningBus: "Bus 01", // Có thể lấy từ API sau
+        afternoonBus: "Bus 01", // Có thể lấy từ API sau
+        created: null, // Có thể thêm vào API sau
+        note: s.note ?? "",
+        school_id: s.school_id ?? null,
+        id_ph: s.id_ph ?? parentId,
+        lat: s.lat ?? null,
+        lng: s.lng ?? null,
+        actions: ""
+      }));
 
-      setData(mapped);
+      setData(transformedData);
+      console.log("Fetched students:", res.data);
     } catch (error) {
       console.error("Error fetching students:", error);
       setData([]);
@@ -73,7 +77,6 @@ const Students = () => {
   const currentData = data.slice(indexOfFirst, indexOfLast);
 
   const currentColumns = STUDENT_TABS[activeTab]?.columns ?? [];
-  const currentColumns = STUDENT_TABS[activeTab]?.columns ?? [];
 
   const renderCell = (student, key) => {
     switch (key) {
@@ -99,36 +102,7 @@ const Students = () => {
         return student[key] ?? "-";
     }
   };
-  const renderCell = (student, key) => {
-    switch (key) {
-      case "status":
-        return (
-          <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
-            {student[key]}
-          </span>
-        );
-      case "actions":
-        return (
-          <button
-            className="text-blue-500 hover:text-blue-700"
-            onClick={() => {
-              setSelectedStudent(student);
-              setCurrentPosition({ lat: student.lat, lng: student.lng });
-            }}
-          >
-            View
-          </button>
-        );
-      default:
-        return student[key] ?? "-";
-    }
-  };
 
-
-  const handleRowClick = (student) => {
-    setSelectedStudent(student);
-    setCurrentPosition({ lat: student.lat, lng: student.lng });
-  };
   const handleRowClick = (student) => {
     setSelectedStudent(student);
     setCurrentPosition({ lat: student.lat, lng: student.lng });
@@ -161,7 +135,7 @@ const Students = () => {
           {selectedStudent ? (
             <MapView position={[selectedStudent.lat, selectedStudent.lng]} check={1} />
           ) : (
-            <MapView position={[10.7554, 106.6784]} check={1}/>
+            <MapView position={[10.7454, 106.6884]} check={1}/>
           )}
         </div>
 

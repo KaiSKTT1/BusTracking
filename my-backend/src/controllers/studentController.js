@@ -25,19 +25,22 @@ let getAllStudents = async (req, res) => {
 };
 let getStudentsByParentId = async (req, res) => {
     let { id_ph } = req.params;
+    console.log(`Fetching students for parent ID: ${id_ph}`);
     try {
         const query = `
             SELECT
                 s.student_id,
                 s.name,
                 s.id_ph,
-                u.name as parent_name,
+                s.note,
+                s.school_id,
+                u.username as parent_name,
                 u.phone as parent_phone,
                 u.email as parent_email
-            FROM students s
-            LEFT JOIN users u ON s.id_ph = user.id
+            FROM student s
+            LEFT JOIN user_account u ON s.id_ph = u.user_id
             WHERE s.id_ph = ?
-            ORDER BY s.id_ph DESC
+            ORDER BY s.student_id DESC
         `;
         const [rows] = await pool.execute(query, [id_ph]);
         return res.status(200).json(rows);
