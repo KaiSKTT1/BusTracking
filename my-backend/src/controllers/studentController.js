@@ -16,7 +16,7 @@ let getAllStudents = async (req, res) => {
             LEFT JOIN user_account u ON s.id_ph = u.user_id
             ORDER BY s.student_id DESC
         `;
-        const [rows] = await pool.execute(query, [id_ph]);
+        const [rows] = await pool.execute(query);
         return res.status(200).json(rows);
     } catch (err) {
         console.error("Error in getAllStudents:", err);
@@ -32,14 +32,12 @@ let getStudentsByParentId = async (req, res) => {
                 s.student_id,
                 s.name,
                 s.id_ph,
-                s.note,
                 s.school_id,
                 u.username as parent_name,
-                u.phone as parent_phone,
                 u.email as parent_email
             FROM student s
             LEFT JOIN user_account u ON s.id_ph = u.user_id
-            WHERE s.id_ph = ?
+            WHERE u.user_id = ?
             ORDER BY s.student_id DESC
         `;
         const [rows] = await pool.execute(query, [id_ph]);

@@ -28,43 +28,26 @@ const [currentPosition, setCurrentPosition] = useState(null);
 const parentId = Number(localStorage.getItem("parentId")) || null;
 
   const fetchStudents = async () => {
-    setLoading(true);
-    try {
-      // lấy danh sách student từ backend (theo SQL dump: table `student`)
-      const res = await api.get("/parent/1");
-      const students = Array.isArray(res.data) ? res.data : Array.isArray(res.data?.data) ? res.data.data : [];
+  setLoading(true);
+  try {
+    const res = await api.get("/students/parent/" + parentId);
+    const students = Array.isArray(res.data) ? res.data : Array.isArray(res.data?.data) ? res.data.data : [];
 
-      // lọc theo phụ huynh (id_ph)
-      const myStudents = parentId ? students.filter((s) => Number(s.id_ph) === Number(parentId)) : students;
+    // lọc theo phụ huynh
+    const myStudents = parentId ? students.filter((s) => Number(s.id_ph) === Number(parentId)) : students;
 
-      // lọc theo tab
-       const transformedData = rawStudents.map((s) => ({
-        id: s.student_id ?? s.id,
-        name: s.name ?? "",
-        parentName: s.parent_name ?? "N/A",
-        parentEmail: s.parent_email ?? "N/A",
-        parentPhone: s.parent_phone ?? "N/A",
-        status: "Active", // Mặc định là Active, có thể thay đổi sau
-        morningBus: "Bus 01", // Có thể lấy từ API sau
-        afternoonBus: "Bus 01", // Có thể lấy từ API sau
-        created: null, // Có thể thêm vào API sau
-        note: s.note ?? "",
-        school_id: s.school_id ?? null,
-        id_ph: s.id_ph ?? parentId,
-        lat: s.lat ?? null,
-        lng: s.lng ?? null,
-        actions: ""
-      }));
+    // map dữ liệu cho table
+    
 
-      setData(transformedData);
-      console.log("Fetched students:", res.data);
-    } catch (error) {
-      console.error("Error fetching students:", error);
-      setData([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+    setData(res.data);
+    console.log("Fetched students:", res);
+  } catch (error) {
+    console.error("Error fetching students:", error);
+    setData([]);
+  } finally {
+    setLoading(false);
+  }
+};
 
   useEffect(() => {
     fetchStudents();
@@ -92,7 +75,7 @@ const parentId = Number(localStorage.getItem("parentId")) || null;
             className="text-blue-500 hover:text-blue-700"
             onClick={() => {
               setSelectedStudent(student);
-              setCurrentPosition({ lat: student.lat, lng: student.lng });
+              setCurrentPosition({ lat: 10.77500000, lng: 106.70000000 });
             }}
           >
             View
@@ -121,7 +104,6 @@ const parentId = Number(localStorage.getItem("parentId")) || null;
           />
           <Button title="Add Student" icon={<PlusIcon />} />
         </div>
-
         <SearchBar />
         <Table
           loading={loading}
@@ -133,7 +115,7 @@ const parentId = Number(localStorage.getItem("parentId")) || null;
 
         <div className="flex justify-center mt-4 h-[400px]">
           {selectedStudent ? (
-            <MapView position={[selectedStudent.lat, selectedStudent.lng]} check={1} />
+            <MapView position={[10.77500000, 106.70000000]} check={1} />
           ) : (
             <MapView position={[10.7454, 106.6884]} check={1}/>
           )}

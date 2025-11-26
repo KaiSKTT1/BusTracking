@@ -3,8 +3,8 @@ import studentController from "../../controllers/studentController.js"; // Sửa
 
 const router = express.Router();
 
-router.get("/", studentController.getAllStudents);
 router.get("/parent/:id_ph", studentController.getStudentsByParentId);
+router.get("/", studentController.getAllStudents);
 router.get("/:id", studentController.getStudentById);
 router.post("/", studentController.createStudent);
 router.put("/:id", studentController.updateStudent);

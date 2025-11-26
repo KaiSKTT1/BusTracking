@@ -5,11 +5,11 @@ export const STUDENT_TABS = {
         label: 'ACTIVE',
         icon: ICONS.plane,
         columns: [
-            { key: 'id', label: 'ID', width: '80px' },
+            { key: 'student_id', label: 'ID', width: '80px' },
             { key: 'name', label: 'Name', width: '200px' },
-            { key: 'parentName', label: 'Parent Name', width: '250px' },
-            { key: 'parentEmail', label: 'Parent Email', width: '150px' },
-            { key: 'status', label: 'Status', width: '120px' },
+            { key: 'parent_name', label: 'Parent Name', width: '250px' },
+            { key: 'parent_email', label: 'Parent Email', width: '150px' },
+            // { key: 'status', label: 'Status', width: '120px' },
             { key: 'actions', label: 'Actions', width: '120px' }
         ]
     },
