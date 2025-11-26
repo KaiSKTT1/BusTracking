@@ -20,6 +20,7 @@ import { FaCalendarAlt } from "react-icons/fa";
 import { FaBullhorn } from "react-icons/fa";
 import { FaShuttleVan } from "react-icons/fa";
 import { FaRoute } from "react-icons/fa";
+import { FaUser } from "react-icons/fa";
 
 export const ICONS = {
     Dashboard: FaHouse, //Icon cho item nav Dashboard
@@ -44,5 +45,6 @@ export const ICONS = {
     Schedules: FaCalendarAlt,
     Notify: FaBullhorn,
     PickupDropoff: FaShuttleVan,
+    AccountViewer: FaUser,
 
 };

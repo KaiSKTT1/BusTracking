@@ -31,7 +31,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Mount routes (giữ các endpoint cũ để frontend không đổi)
 app.use("/auth", authRouter);
 
-app.use(["/users", "/user_account"], userRouter);
+app.use(["/users", "/user_account", "/user"], userRouter);
 app.use(["/buses", "/bus"], busRouter);
 app.use(["/routes", "/route"], routeRouter);
 app.use(["/trips", "/trip"], tripRouter);

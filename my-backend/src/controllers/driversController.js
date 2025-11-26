@@ -66,7 +66,7 @@ let createDriver = async (req, res) => {
         if (existing.length > 0) {
             return res.status(400).json({ message: 'Email already exists' });
         }
-        
+
         const [result] = await pool.execute(
             'INSERT INTO user_account (username, email, password, role_id, status) VALUES (?, ?, ?, 2, "active")',
             [username, email, password]
@@ -162,7 +162,7 @@ let deleteDriver = async (req, res) => {
                 message: 'Cannot delete driver with assigned timetables'
             });
         }
-        
+
         const [trips] = await pool.execute(
             'SELECT trip_id FROM trip WHERE driver_id = ?', [id]
         );

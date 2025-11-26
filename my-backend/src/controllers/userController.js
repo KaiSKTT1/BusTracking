@@ -20,6 +20,39 @@ let getAllUsers = async (req, res) => {
         return res.status(500).json({ message: err.message });
     }
 };
+let getUserById = async (req, res) => {
+    const { id } = req.params;
+    console.log(`Fetching user with id: ${id}`);
+
+    try {
+        const query = `
+            SELECT 
+                ua.user_id AS id,
+                ua.username AS name,
+                ua.email,
+                ua.status,
+                r.name_role AS role
+            FROM user_account ua
+            LEFT JOIN role r ON ua.role_id = r.role_id
+            WHERE ua.user_id = ?
+        `;
+
+        const [rows] = await pool.execute(query, [id]);
+
+        if (rows.length === 0) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        return res.status(200).json({
+            message: "ok",
+            data: rows[0]
+        });
+    } catch (err) {
+        console.error("Error in getUserById:", err);
+        return res.status(500).json({ message: err.message });
+    }
+};
+
 
 let createNewUser = async (req, res) => {
     console.log('Creating new user with body:', req.body);
@@ -105,6 +138,7 @@ let deleteUser = async (req, res) => {
 
 export default {
     getAllUsers,
+    getUserById,
     createNewUser,
     updateUser,
     deleteUser

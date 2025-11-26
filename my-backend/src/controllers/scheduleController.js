@@ -211,6 +211,100 @@ let getRoutesByDriver = async (req, res) => {
         return res.status(500).json({ message: err.message });
     }
 };
+// let getBusesByDriverAndDate = async (req, res) => {
+//     const { driverId, date } = req.params;
+
+//     try {
+//         const [rows] = await pool.execute(
+//             `
+//             SELECT DISTINCT 
+//                 tt.bus_id,
+//                 b.license,
+//                 b.capacity
+//             FROM timetable tt
+//             JOIN bus b ON tt.bus_id = b.bus_id
+//             WHERE tt.driver_id = ? 
+//               AND tt.planned_date = ?
+//             `,
+//             [driverId, date]
+//         );
+
+//         return res.status(200).json(rows);
+//     } catch (err) {
+//         console.error("Error getBusesByDriverAndDate:", err);
+//         return res.status(500).json({ message: err.message });
+//     }
+// };
+let getStudentsByDriverBusAndDate = async (req, res) => {
+    const { driverId, busId, date } = req.params;
+
+    try {
+        const [rows] = await pool.execute(
+            `
+            SELECT 
+                tt.timetable_id,
+                s.student_id, 
+                s.name, 
+                s.note,
+                s.school_id,
+                s.id_ph
+            FROM student_ride sr
+            JOIN timetable tt 
+                ON sr.timetable_id = tt.timetable_id
+            JOIN student s 
+                ON sr.student_id = s.student_id
+            WHERE tt.driver_id = ?
+              AND tt.bus_id = ?
+              AND tt.planned_date = ?
+            `,
+            [driverId, busId, date]
+        );
+
+        return res.status(200).json({
+            message: "ok",
+            data: rows
+        });
+
+    } catch (err) {
+        console.error("Error getStudentsByDriverBusAndDate:", err);
+        return res.status(500).json({ message: err.message });
+    }
+};
+
+
+
+let getBusesByDriverAndDate = async (req, res) => {
+    const { driverId, date } = req.params;
+
+    try {
+        const [rows] = await pool.execute(
+            `
+            SELECT DISTINCT 
+                tt.timetable_id,
+                b.bus_id,
+                b.license,
+                b.capacity
+            FROM timetable tt
+            JOIN bus b ON tt.bus_id = b.bus_id
+            WHERE tt.driver_id = ? 
+              AND tt.planned_date = ?
+            `,
+            [driverId, date]
+        );
+
+        return res.status(200).json({
+            message: "ok",
+            data: rows
+        });
+    } catch (err) {
+        console.error("Error getBusesByDriverAndDate:", err);
+        return res.status(500).json({ message: err.message });
+    }
+};
+
+
+
+
 
 
 
@@ -224,6 +318,8 @@ export default {
     getAllTimetables,
     getStudentsByDriver,
     getStudentsByDriverAndDate,
-    getRoutesByDriver
+    getRoutesByDriver,
+    getStudentsByDriverBusAndDate,
+    getBusesByDriverAndDate
     // Thêm các hàm delete... nếu cần
 };
