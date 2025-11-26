@@ -22,6 +22,29 @@ let getAllStudents = async (req, res) => {
         return res.status(500).json({ message: err.message });
     }
 };
+let getStudentsByParentId = async (req, res) => {
+    let { id_ph } = req.params;
+    try {
+        const query = `
+            SELECT
+                s.student_id,
+                s.name,
+                s.id_ph,
+                u.name as parent_name,
+                u.phone as parent_phone,
+                u.email as parent_email
+            FROM students s
+            LEFT JOIN users u ON s.id_ph = user.id
+            WHERE s.id_ph = ?
+            ORDER BY s.id_ph DESC
+        `;
+        const [rows] = await pool.execute(query, [id_ph]);
+        return res.status(200).json(rows);
+    } catch (err) {
+        console.error("Error fetching students by parent ID:", err);
+        return res.status(500).json({ message: err.message });
+    }
+};
 
 let getStudentById = async (req, res) => {
     let { id } = req.params;
@@ -106,4 +129,5 @@ export default {
     createStudent,
     updateStudent,
     deleteStudent,
+    getStudentsByParentId
 };
