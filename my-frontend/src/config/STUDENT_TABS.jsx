@@ -9,10 +9,7 @@ export const STUDENT_TABS = {
             { key: 'name', label: 'Name', width: '200px' },
             { key: 'parentName', label: 'Parent Name', width: '250px' },
             { key: 'parentEmail', label: 'Parent Email', width: '150px' },
-            { key: 'morningBus', label: 'Morning Bus', width: '120px' },
-            { key: 'afternoonBus', label: 'Afternoon Bus', width: '150px' },
             { key: 'status', label: 'Status', width: '120px' },
-            { key: 'created', label: 'Created', width: '120px' },
             { key: 'actions', label: 'Actions', width: '120px' }
         ]
     },
@@ -24,10 +21,7 @@ export const STUDENT_TABS = {
             { key: 'name', label: 'Name', width: '200px' },
             { key: 'parentName', label: 'Parent Name', width: '250px' },
             { key: 'parentEmail', label: 'Parent Email', width: '150px' },
-            { key: 'morningBus', label: 'Morning Bus', width: '120px' },
-            { key: 'afternoonBus', label: 'Afternoon Bus', width: '150px' },
             { key: 'status', label: 'Status', width: '120px' },
-            { key: 'created', label: 'Created', width: '120px' },
             { key: 'actions', label: 'Actions', width: '120px' }
         ]
     },

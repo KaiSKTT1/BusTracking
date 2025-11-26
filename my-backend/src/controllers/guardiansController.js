@@ -1,23 +1,40 @@
 import pool from '../configs/connectDB.js';
 
-// GET all guardians (role = 'Parent')
 let getAllGuardians = async (req, res) => {
+    console.log('Fetching all guardians...');
     try {
         const [rows] = await pool.execute(
-            "SELECT id, name, phone, email, role, created_at FROM users WHERE role = 'Parent'"
+            `SELECT 
+                ua.user_id as id, 
+                ua.username as name, 
+                ua.email, 
+                r.name_role as role,
+                ua.status
+             FROM user_account ua
+             JOIN role r ON ua.role_id = r.role_id
+             WHERE r.name_role = 'Parent'`
         );
         return res.status(200).json({ message: 'ok', data: rows });
     } catch (err) {
+        console.error('Error in getAllGuardians:', err);
         return res.status(500).json({ message: err.message });
     }
 };
 
-// GET guardian by ID
 let getGuardianById = async (req, res) => {
     const { id } = req.params;
+    console.log(`Fetching guardian with id: ${id}`);
     try {
         const [rows] = await pool.execute(
-            "SELECT id, name, phone, email, role, created_at FROM users WHERE id = ? AND role = 'Parent'",
+            `SELECT 
+                ua.user_id as id, 
+                ua.username as name, 
+                ua.email, 
+                r.name_role as role,
+                ua.status
+             FROM user_account ua
+             JOIN role r ON ua.role_id = r.role_id
+             WHERE ua.user_id = ? AND r.name_role = 'Parent'`,
             [id]
         );
         if (rows.length === 0) {
@@ -25,38 +42,34 @@ let getGuardianById = async (req, res) => {
         }
         return res.status(200).json({ message: 'ok', data: rows[0] });
     } catch (err) {
+        console.error(`Error in getGuardianById (id: ${id}):`, err);
         return res.status(500).json({ message: err.message });
     }
 };
 
-// CREATE new guardian
 let createGuardian = async (req, res) => {
-    const { name, phone, email, password } = req.body;
+    console.log('Creating new guardian with body:', req.body);
+    const { username, email, password } = req.body;
 
-    // Validation
-    if (!name || !email || !password) {
+    if (!username || !email || !password) {
         return res.status(400).json({
-            message: 'Missing required fields: name, email, password'
+            message: 'Missing required fields: username, email, password'
         });
     }
 
     try {
-        // Check if email already exists
         const [existing] = await pool.execute(
-            'SELECT id FROM users WHERE email = ?',
+            'SELECT user_id FROM user_account WHERE email = ?',
             [email]
         );
 
         if (existing.length > 0) {
-            return res.status(400).json({
-                message: 'Email already exists'
-            });
+            return res.status(400).json({ message: 'Email already exists' });
         }
 
-        // Insert new guardian with role = 'Parent'
         const [result] = await pool.execute(
-            'INSERT INTO users (name, phone, email, password, role) VALUES (?, ?, ?, ?, ?)',
-            [name, phone || null, email, password, 'Parent']
+            'INSERT INTO user_account (username, email, password, role_id, status) VALUES (?, ?, ?, 3, "active")',
+            [username, email, password]
         );
 
         return res.status(201).json({
@@ -64,6 +77,7 @@ let createGuardian = async (req, res) => {
             data: { id: result.insertId }
         });
     } catch (err) {
+        console.error('Error in createGuardian:', err);
         return res.status(500).json({ message: err.message });
     }
 };
@@ -71,19 +85,20 @@ let createGuardian = async (req, res) => {
 // UPDATE guardian
 let updateGuardian = async (req, res) => {
     const { id } = req.params;
-    const { name, phone, email, password } = req.body;
+    // SỬA 1: Thêm 'status' vào đây
+    const { username, email, password, status } = req.body;
+    console.log(`Updating guardian ${id} with body:`, req.body); // Log này sẽ hiển thị cả status
 
-    // Validation
-    if (!name || !email) {
+    // SỬA 2: Thêm 'status' vào validation
+    if (!username || !email || !status) {
         return res.status(400).json({
-            message: 'Missing required fields: name, email'
+            message: 'Missing required fields: username, email, status'
         });
     }
 
     try {
-        // Check if guardian exists and role is Parent
         const [guardian] = await pool.execute(
-            "SELECT id FROM users WHERE id = ? AND role = 'Parent'",
+            "SELECT ua.user_id FROM user_account ua JOIN role r ON ua.role_id = r.role_id WHERE ua.user_id = ? AND r.name_role = 'Parent'",
             [id]
         );
 
@@ -91,47 +106,48 @@ let updateGuardian = async (req, res) => {
             return res.status(404).json({ message: 'Guardian not found' });
         }
 
-        // Check if new email already exists (excluding current guardian)
         const [existing] = await pool.execute(
-            'SELECT id FROM users WHERE email = ? AND id != ?',
+            'SELECT user_id FROM user_account WHERE email = ? AND user_id != ?',
             [email, id]
         );
 
         if (existing.length > 0) {
-            return res.status(400).json({
-                message: 'Email already exists'
-            });
+            return res.status(400).json({ message: 'Email already exists' });
         }
 
-        // Update query - only update password if provided
+        // SỬA 3: Cập nhật các câu query để bao gồm 'status'
+        let result;
         if (password) {
-            await pool.execute(
-                'UPDATE users SET name = ?, phone = ?, email = ?, password = ? WHERE id = ?',
-                [name, phone || null, email, password, id]
+            [result] = await pool.execute(
+                'UPDATE user_account SET username = ?, email = ?, password = ?, status = ? WHERE user_id = ?',
+                [username, email, password, status, id]
             );
         } else {
-            await pool.execute(
-                'UPDATE users SET name = ?, phone = ?, email = ? WHERE id = ?',
-                [name, phone || null, email, id]
+            [result] = await pool.execute(
+                'UPDATE user_account SET username = ?, email = ?, status = ? WHERE user_id = ?',
+                [username, email, status, id]
             );
         }
+        
+        // (Phần kiểm tra result.affectedRows đã có từ trước)
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: 'Guardian not found or data unchanged' });
+        }
 
-        return res.status(200).json({
-            message: 'Guardian updated successfully'
-        });
+        return res.status(200).json({ message: 'Guardian updated successfully' });
     } catch (err) {
+        console.error(`Error in updateGuardian (id: ${id}):`, err);
         return res.status(500).json({ message: err.message });
     }
 };
 
-// DELETE guardian
 let deleteGuardian = async (req, res) => {
     const { id } = req.params;
+    console.log(`Deleting guardian with id: ${id}`);
 
     try {
-        // Check if guardian exists and role is Parent
         const [guardian] = await pool.execute(
-            "SELECT id FROM users WHERE id = ? AND role = 'Parent'",
+            "SELECT ua.user_id FROM user_account ua JOIN role r ON ua.role_id = r.role_id WHERE ua.user_id = ? AND r.name_role = 'Parent'",
             [id]
         );
 
@@ -139,9 +155,8 @@ let deleteGuardian = async (req, res) => {
             return res.status(404).json({ message: 'Guardian not found' });
         }
 
-        // Check if guardian has students (prevent deletion)
         const [students] = await pool.execute(
-            'SELECT id FROM students WHERE parent_id = ?',
+            'SELECT student_id FROM student WHERE id_ph = ?',
             [id]
         );
 
@@ -151,13 +166,17 @@ let deleteGuardian = async (req, res) => {
             });
         }
 
-        // Delete guardian
-        await pool.execute('DELETE FROM users WHERE id = ?', [id]);
+        // Sửa: Lấy kết quả [result]
+        const [result] = await pool.execute('DELETE FROM user_account WHERE user_id = ?', [id]);
 
-        return res.status(200).json({
-            message: 'Guardian deleted successfully'
-        });
+        // Sửa: Kiểm tra affectedRows
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: 'Guardian not found' });
+        }
+
+        return res.status(200).json({ message: 'Guardian deleted successfully' });
     } catch (err) {
+        console.error(`Error in deleteGuardian (id: ${id}):`, err);
         return res.status(500).json({ message: err.message });
     }
 };

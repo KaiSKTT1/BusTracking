@@ -1,5 +1,7 @@
 
 import React, { useState, useEffect } from "react";
+
+import React, { useState, useEffect } from "react";
 import TitlePage from "../../components/title_pages/TitlePage";
 import Header from "../../components/header/Header";
 import { ICONS } from "../../config/ICONS";
@@ -9,6 +11,7 @@ import SearchBar from "../../components/table/SearchBar";
 import Table from "../../components/table/Table";
 import "leaflet/dist/leaflet.css";
 import MapView from "../../components/map/MapView";
+import api from "../../utils/axios";
 import api from "../../utils/axios";
 
 const Students = () => {
@@ -20,7 +23,19 @@ const Students = () => {
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const StudentIcon = ICONS.Students;
+  const PlusIcon = ICONS.plus;
 
+  const [activeTab, setActiveTab] = useState("active");
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+
+  const [selectedStudent, setSelectedStudent] = useState(null);
+  const [currentPosition, setCurrentPosition] = useState(null);
+
+  const parentId = Number(localStorage.getItem("parentId")) || null;
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [currentPosition, setCurrentPosition] = useState(null);
 
@@ -58,7 +73,32 @@ const Students = () => {
   const currentData = data.slice(indexOfFirst, indexOfLast);
 
   const currentColumns = STUDENT_TABS[activeTab]?.columns ?? [];
+  const currentColumns = STUDENT_TABS[activeTab]?.columns ?? [];
 
+  const renderCell = (student, key) => {
+    switch (key) {
+      case "status":
+        return (
+          <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
+            {student[key]}
+          </span>
+        );
+      case "actions":
+        return (
+          <button
+            className="text-blue-500 hover:text-blue-700"
+            onClick={() => {
+              setSelectedStudent(student);
+              setCurrentPosition({ lat: student.lat, lng: student.lng });
+            }}
+          >
+            View
+          </button>
+        );
+      default:
+        return student[key] ?? "-";
+    }
+  };
   const renderCell = (student, key) => {
     switch (key) {
       case "status":
@@ -85,6 +125,10 @@ const Students = () => {
   };
 
 
+  const handleRowClick = (student) => {
+    setSelectedStudent(student);
+    setCurrentPosition({ lat: student.lat, lng: student.lng });
+  };
   const handleRowClick = (student) => {
     setSelectedStudent(student);
     setCurrentPosition({ lat: student.lat, lng: student.lng });

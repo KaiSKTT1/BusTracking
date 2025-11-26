@@ -1,5 +1,5 @@
 import express from "express";
-import guardiansController from "../controllers/guardiansController.js";
+import guardiansController from "../../controllers/guardiansController.js";
 
 const router = express.Router();
 

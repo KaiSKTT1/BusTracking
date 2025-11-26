@@ -37,6 +37,7 @@ import PickupDropoff from "./pages/driver/PickupDropoff";
 import ScheduleViewer from "./pages/driver/Schedules";
 import Report from "./pages/driver/Report";
 import Drivers from "./pages/admin/Drivers";
+import AccountViewer from "./pages/driver/AccountViewer";
 
 function App() {
   return (
@@ -155,11 +156,20 @@ function App() {
               <ScheduleViewer />
             </DriversLayout>
           }
-        /> <Route
+        />
+        <Route
           path="/driver/report"
           element={
             <DriversLayout>
               <Report />
+            </DriversLayout>
+          }
+        />
+        <Route
+          path="/driver/info"
+          element={
+            <DriversLayout>
+              <AccountViewer />
             </DriversLayout>
           }
         />

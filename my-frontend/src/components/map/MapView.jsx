@@ -21,7 +21,7 @@ const MapView = ({ position, check }) => {
 
             <MapUpdater position={position} />
             
-            {check ==1 && <Routing start={[position[0],position[1]]} end={[10.7554, 106.6784]}/> }
+            {check==1 && <Routing start={[position[0],position[1]]} end={[10.7554, 106.6784]}/>}
     
 
         </MapContainer>

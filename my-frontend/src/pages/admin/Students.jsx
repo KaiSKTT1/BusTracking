@@ -46,22 +46,22 @@ const Students = () => {
     setLoading(true);
     try {
       const response = await api.get("/students");
-      console.log("Students data:", response.data);
+      const raw = Array.isArray(response.data) ? response.data : (Array.isArray(response.data?.data) ? response.data.data : []);
+      console.log("Students data:", raw);
 
-      // Transform data to match table columns
-      const transformedData = response.data.map(student => ({
-        id: student.id,
-        name: student.name,
-        address: student.address || "N/A",
-        parent_id: student.parent_id,
-        parentName: student.parent_name || "N/A",
-        parentEmail: student.parent_email || "N/A",
-        parentPhone: student.parent_phone || "N/A",
-        morningBus: "Bus 01", // TODO: Get from actual bus assignment
-        afternoonBus: "Bus 01", // TODO: Get from actual bus assignment
-        status: "Active",
-        created: new Date().toISOString().split('T')[0],
-        actions: "" // Will be rendered as buttons
+      const transformedData = raw.map((s) => ({
+        id: s.student_id ?? s.id,
+        name: s.name ?? s.username ?? "",
+        address: s.note ?? "N/A",            // note in DB used as address/extra
+        parent_id: s.id_ph ?? s.parent_id ?? null,
+        parentName: s.parent_name ?? "N/A",
+        parentEmail: s.parent_email ?? "N/A",
+        parentPhone: s.parent_phone ?? "N/A",
+        morningBus: s.morning_bus ?? "Bus 01",
+        afternoonBus: s.afternoon_bus ?? "Bus 01",
+        status: s.status ?? "Active",
+        created: s.created_at ?? s.created ?? null,
+        actions: ""
       }));
 
       setData(transformedData);
@@ -122,22 +122,13 @@ const Students = () => {
     try {
       await api.put(`/students/${selectedStudent.id}`, {
         name: updatedData.name,
-        address: updatedData.address,
-        parent_id: selectedStudent.parent_id
+        note: updatedData.address,       // note column in DB
+        id_ph: selectedStudent.parent_id // parent id column in DB
       });
       fetchStudents();
       setShowEditModal(false);
       setSelectedStudent(null);
-      // Toast màu vàng cho Update
-      toast("Student updated successfully!", {
-        duration: 3000,
-        icon: "✏️",
-        style: {
-          background: '#fefce8',
-          color: '#854d0e',
-          border: '1px solid #fde047',
-        },
-      });
+      toast("Student updated successfully!", { icon: "✏️" });
     } catch (error) {
       console.error("Error updating student:", error);
       toast.error("Failed to update student!");
@@ -148,12 +139,12 @@ const Students = () => {
     try {
       await api.post("/students", {
         name: newStudent.name,
-        address: newStudent.email, // Tạm dùng email làm address
-        parent_id: null // TODO: Get actual parent_id
+        note: newStudent.address ?? newStudent.email ?? null,
+        id_ph: null,
+        school_id: newStudent.school_id ?? 1
       });
       fetchStudents();
       setShowCreateModal(false);
-      // Toast màu xanh lá cho Create
       toast.success("Student created successfully!");
     } catch (error) {
       console.error("Error creating student:", error);
@@ -167,7 +158,6 @@ const Students = () => {
       fetchStudents();
       setShowDeleteModal(false);
       setSelectedStudent(null);
-      // Toast màu đỏ cho Delete
       toast.error("Student deleted successfully!");
     } catch (error) {
       console.error("Error deleting student:", error);

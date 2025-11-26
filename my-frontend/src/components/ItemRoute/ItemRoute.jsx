@@ -1,3 +1,4 @@
+import React from "react";
 import { FaBus, FaMapMarkerAlt, FaUsers, FaRoad } from "react-icons/fa";
 
 const ItemRoute = ({ route, isSelected, onClick }) => {
@@ -38,7 +39,7 @@ const ItemRoute = ({ route, isSelected, onClick }) => {
                 <span className="font-medium">{route.busNumber}</span>
             </div>
 
-            {/* Waypoints List */}
+            {/* Waypoints List (ĐÃ SỬA Ở ĐÂY) */}
             <div className="space-y-2 mb-3">
                 {route.waypoints && route.waypoints.length > 0 ? (
                     route.waypoints.map((waypoint, index) => (
@@ -52,9 +53,13 @@ const ItemRoute = ({ route, isSelected, onClick }) => {
                                     }`}
                                 size={12}
                             />
+                            {/* --- BẮT ĐẦU SỬA --- */}
                             <div className="flex-1">
-                                <p className="text-gray-600 leading-tight">
+                                <p className="font-medium text-gray-700 leading-tight">
                                     {waypoint.name}
+                                </p>
+                                <p className="text-xs text-gray-500 leading-tight mt-0.5">
+                                    {waypoint.address} {/* <-- Thêm địa chỉ ở đây */}
                                 </p>
                                 {waypoint.students > 0 && (
                                     <p className="text-xs text-gray-400 mt-0.5">
@@ -62,6 +67,7 @@ const ItemRoute = ({ route, isSelected, onClick }) => {
                                     </p>
                                 )}
                             </div>
+                            {/* --- KẾT THÚC SỬA --- */}
                         </div>
                     ))
                 ) : (

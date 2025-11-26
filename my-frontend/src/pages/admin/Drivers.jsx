@@ -46,24 +46,18 @@ const Drivers = () => {
     setLoading(true);
     try {
       const response = await api.get('/drivers');
-      console.log("Driver API Response:", response.data);
+      const raw = Array.isArray(response.data) ? response.data : (Array.isArray(response.data?.data) ? response.data.data : []);
+      console.log("Driver Data:", raw);
 
-      // Backend trả về array trực tiếp hoặc { message: 'ok', data: [...] }
-      let driverData = Array.isArray(response.data)
-        ? response.data
-        : Array.isArray(response.data.data)
-          ? response.data.data
-          : [];
-
-      console.log("Driver Data:", driverData);
-
-      // Set status mặc định là "Active" vì DB không có cột status
-      driverData = driverData.map(driver => ({
-        ...driver,
-        status: "Active"
+      const driverData = raw.map(d => ({
+        id: d.user_id ?? d.id,
+        name: d.username ?? d.name ?? "",
+        email: d.email ?? "N/A",
+        phone: d.phone ?? "N/A",
+        status: d.status ?? "Active",
+        created_at: d.created_at ?? d.created ?? null
       }));
 
-      console.log("Final Driver Data:", driverData);
       setData(driverData);
     } catch (error) {
       console.error("Error fetching drivers:", error);
@@ -121,21 +115,11 @@ const Drivers = () => {
   const handleSaveEdit = async (updatedData) => {
     try {
       await api.put(`/drivers/${selectedDriver.id}`, {
-        name: updatedData.name,
-        email: updatedData.email,
-        phone: updatedData.phone,
-        // Không gửi password nếu không đổi
+        username: updatedData.name,
+        email: updatedData.email
       });
 
-      toast("Driver updated successfully!", {
-        icon: "📝",
-        style: {
-          background: "#fffbeb",
-          color: "#92400e",
-          border: "1px solid #fde68a",
-        },
-      });
-
+      toast("Driver updated successfully!", { icon: "📝" });
       fetchDrivers();
       setIsEditModalOpen(false);
     } catch (error) {
@@ -147,10 +131,10 @@ const Drivers = () => {
   const handleCreateDriver = async (newDriver) => {
     try {
       await api.post("/drivers", {
-        name: newDriver.name,
+        username: newDriver.name,
         email: newDriver.email,
-        phone: newDriver.phone,
         password: newDriver.password || "123456",
+        role_id: 2
       });
 
       toast.success("Driver created successfully!");
@@ -165,7 +149,6 @@ const Drivers = () => {
   const confirmDelete = async () => {
     try {
       await api.delete(`/drivers/${selectedDriver.id}`);
-
       toast.error("Driver deleted successfully!");
       fetchDrivers();
       setIsDeleteModalOpen(false);
